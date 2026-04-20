@@ -4,6 +4,7 @@ import { useReveal } from '../hooks/use-reveal';
 import { useScrollDirection } from '../hooks/use-scroll-direction';
 
 
+
 const logos = [
   { n: 'Supabase', c: '#3ecf8e', x: 0.08, y: 0.2 },
   { n: 'React',    c: '#61dafb', x: 0.22, y: 0.55 },
