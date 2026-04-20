@@ -97,7 +97,7 @@ export function Footer() {
 				paddingTop: 120,
 			}}
 		>
-			{/* Giant wordmark — semi-transparent background, centered */}
+			
 			<div
 				aria-hidden="true"
 				style={{
