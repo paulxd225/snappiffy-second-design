@@ -46,7 +46,7 @@ export function Header() {
           ))}
         </nav>
         <div className="row center gap-12">
-          <button className="row center gap-8" style={{ color: 'var(--paper)', fontSize: 13, fontFamily: 'var(--mono)', letterSpacing: '0.1em' }}>
+          <button type="button" className="row center gap-8" style={{ color: 'var(--paper)', fontSize: 13, fontFamily: 'var(--mono)', letterSpacing: '0.1em' }}>
             <Icons.globe style={{ width: 16, height: 16 }}/> EN
           </button>
           <a href="#contact" className="btn btn-primary" style={{ padding: '10px 18px', fontSize: 13 }}>
