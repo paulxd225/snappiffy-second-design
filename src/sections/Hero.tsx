@@ -1,7 +1,20 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import heroBg from "../assets/hero-bg.jpg";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
+
+const HERO_PREFIX = "Custom ";
+const DYNAMIC_PHRASES = [
+	"mobile apps,",
+	"marketplaces,",
+	"internal apps,",
+	"websites,",
+	"MVP's,",
+	"solutions,",
+] as const;
+const MS_PER_CHAR = 85;
+const PAUSE_AFTER_PHRASE_MS = 1000;
+const INTRO_TARGET = `${HERO_PREFIX}${DYNAMIC_PHRASES[0]}`;
 
 const techStack = [
 	{ n: "Supabase", c: "#3ecf8e" },
@@ -95,10 +108,20 @@ function TechMarquee() {
 	);
 }
 
+type CyclePhase = "hold" | "deleting" | "typing";
+
 export function Hero() {
 	const ref = useReveal();
 	const mouseRef = useRef<HTMLElement>(null);
 	const [mp, setMp] = useState({ x: 0.5, y: 0.5 });
+
+	const [introProgress, setIntroProgress] = useState(0);
+	const [lineSplit, setLineSplit] = useState(false);
+	const postIntroReady = useRef(false);
+	const [tail, setTail] = useState("");
+	const [cyclePhase, setCyclePhase] = useState<CyclePhase | null>(null);
+	const [activeIdx, setActiveIdx] = useState(0);
+	const [typingTargetIndex, setTypingTargetIndex] = useState(0);
 
 	useEffect(() => {
 		const el = mouseRef.current;
@@ -113,6 +136,68 @@ export function Hero() {
 		el.addEventListener("mousemove", onMove);
 		return () => el.removeEventListener("mousemove", onMove);
 	}, []);
+
+	useEffect(() => {
+		if (introProgress >= INTRO_TARGET.length) return;
+		const t = setTimeout(
+			() => setIntroProgress((p) => p + 1),
+			MS_PER_CHAR,
+		);
+		return () => clearTimeout(t);
+	}, [introProgress]);
+
+	useLayoutEffect(() => {
+		if (introProgress < INTRO_TARGET.length) return;
+		if (postIntroReady.current) return;
+		postIntroReady.current = true;
+		setLineSplit(true);
+		setTail(DYNAMIC_PHRASES[0]);
+		setActiveIdx(0);
+		setCyclePhase("hold");
+	}, [introProgress]);
+
+	useEffect(() => {
+		if (introProgress < INTRO_TARGET.length) return;
+		if (cyclePhase !== "hold") return;
+		const t = setTimeout(() => setCyclePhase("deleting"), PAUSE_AFTER_PHRASE_MS);
+		return () => clearTimeout(t);
+	}, [introProgress, cyclePhase]);
+
+	useEffect(() => {
+		if (introProgress < INTRO_TARGET.length) return;
+		if (cyclePhase !== "deleting") return;
+		if (tail.length === 0) {
+			const next = (activeIdx + 1) % DYNAMIC_PHRASES.length;
+			queueMicrotask(() => {
+				setTypingTargetIndex(next);
+				setCyclePhase("typing");
+			});
+			return;
+		}
+		const t = setTimeout(() => setTail((s) => s.slice(0, -1)), MS_PER_CHAR);
+		return () => clearTimeout(t);
+	}, [introProgress, cyclePhase, tail, activeIdx]);
+
+	useEffect(() => {
+		if (introProgress < INTRO_TARGET.length) return;
+		if (cyclePhase !== "typing") return;
+		const target = DYNAMIC_PHRASES[typingTargetIndex];
+		if (tail.length >= target.length) {
+			const finishedIdx = typingTargetIndex;
+			queueMicrotask(() => {
+				setActiveIdx(finishedIdx);
+				setCyclePhase("hold");
+			});
+			return;
+		}
+		const t = setTimeout(() => {
+			setTail((prev) => {
+				if (prev.length >= target.length) return prev;
+				return target.slice(0, prev.length + 1);
+			});
+		}, MS_PER_CHAR);
+		return () => clearTimeout(t);
+	}, [introProgress, cyclePhase, tail, typingTargetIndex]);
 
 	return (
 		<section
@@ -237,10 +322,25 @@ export function Hero() {
 					</div>
 				</div>
 
-				<h1 style={{ maxWidth: 1100, marginBottom: 24, color: "#ffffff" }}>
-					Custom mobile apps,
-					<br />
+				<h1
+					style={{ maxWidth: 1100, marginBottom: 24, color: "#ffffff" }}
+					aria-label="Custom mobile apps, powered by AI, tailored to your business."
+				>
+					<span aria-hidden="true" style={{ display: "inline" }}>
+						{introProgress < INTRO_TARGET.length
+							? INTRO_TARGET.slice(0, introProgress)
+							: !lineSplit
+								? INTRO_TARGET
+								: (
+										<>
+											{HERO_PREFIX}
+											{tail}
+										</>
+									)}
+					</span>
+					<br aria-hidden="true" />
 					<span
+						aria-hidden="true"
 						style={{
 							background:
 								"linear-gradient(100deg, #c084ff 0%, #9b5cff 55%, #a47bff 100%)",
@@ -251,9 +351,10 @@ export function Hero() {
 					>
 						powered by AI
 					</span>
-					<br />
+					<br aria-hidden="true" />
 					<span
 						className="serif-italic"
+						aria-hidden="true"
 						style={{ fontSize: "0.62em", color: "#eefbe9", opacity: 0.9 }}
 					>
 						— tailored to your business.

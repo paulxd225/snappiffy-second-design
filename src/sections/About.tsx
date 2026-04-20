@@ -2,17 +2,67 @@ import { useEffect, useState } from "react";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
 import { useScrollDirection } from "../hooks/use-scroll-direction";
+import claude from "../assets/platform_logos/claude.svg";
+import css3 from "../assets/platform_logos/css-3.svg";
+import firebase from "../assets/platform_logos/firebase.svg";
+import flutter from "../assets/platform_logos/flutter.svg";
+import flutterflow from "../assets/platform_logos/flutterflow.svg";
+import html1 from "../assets/platform_logos/html-1.svg";
+import javascriptR from "../assets/platform_logos/javascript-r.svg";
+import nestjs from "../assets/platform_logos/nestjs.svg";
+import nodejs from "../assets/platform_logos/nodejs.svg";
+import react from "../assets/platform_logos/react.svg";
+import typescript from "../assets/platform_logos/typescript.svg";
 
-const logos = [
-	{ n: "Supabase", c: "#3ecf8e", x: 0.08, y: 0.2 },
-	{ n: "React", c: "#61dafb", x: 0.22, y: 0.55 },
-	{ n: "Flutter", c: "#54c5f8", x: 0.38, y: 0.15 },
-	{ n: "FlutterFlow", c: "#9b5cff", x: 0.55, y: 0.6 },
-	{ n: "Firebase", c: "#ffa000", x: 0.72, y: 0.22 },
-	{ n: "Nest", c: "#e0234e", x: 0.86, y: 0.55 },
-	{ n: "Node", c: "#68a063", x: 0.1, y: 0.85 },
-	{ n: "TypeScript", c: "#3178c6", x: 0.45, y: 0.9 },
-	{ n: "OpenAI", c: "#10a37f", x: 0.78, y: 0.88 },
+type LogoItem =
+	| {
+			id: string;
+			label: string;
+			x: number;
+			y: number;
+			variant: "single";
+			src: string;
+	  }
+	| {
+			id: string;
+			label: string;
+			x: number;
+			y: number;
+			variant: "triple";
+			srcs: [string, string, string];
+	  };
+
+const logos: LogoItem[] = [
+	{
+		id: "html-css-js",
+		label: "HTML, CSS, JS",
+		x: 0.08,
+		y: 0.2,
+		variant: "triple",
+		srcs: [html1, css3, javascriptR],
+	},
+	{ id: "react", label: "React", x: 0.22, y: 0.55, variant: "single", src: react },
+	{ id: "flutter", label: "Flutter", x: 0.38, y: 0.15, variant: "single", src: flutter },
+	{
+		id: "flutterflow",
+		label: "FlutterFlow",
+		x: 0.55,
+		y: 0.6,
+		variant: "single",
+		src: flutterflow,
+	},
+	{ id: "firebase", label: "Firebase", x: 0.72, y: 0.22, variant: "single", src: firebase },
+	{ id: "nest", label: "Nest", x: 0.86, y: 0.55, variant: "single", src: nestjs },
+	{ id: "node", label: "Node.js", x: 0.1, y: 0.85, variant: "single", src: nodejs },
+	{
+		id: "typescript",
+		label: "TypeScript",
+		x: 0.45,
+		y: 0.9,
+		variant: "single",
+		src: typescript,
+	},
+	{ id: "claude", label: "Claude", x: 0.78, y: 0.88, variant: "single", src: claude },
 ];
 
 function ConstellationBand({ v }: { v: number }) {
@@ -27,11 +77,11 @@ function ConstellationBand({ v }: { v: number }) {
 		<div
 			style={{
 				position: "relative",
-				height: 160,
+				height: 200,
 				width: "100%",
 				overflow: "hidden",
 				borderBottom: "1px solid rgba(14,63,21,.08)",
-				marginBottom: 20,
+				marginBottom: 10,
 			}}
 		>
 			<svg
@@ -50,11 +100,11 @@ function ConstellationBand({ v }: { v: number }) {
 					(it, i) =>
 						i < logos.length - 1 && (
 							<line
-								key={it.n}
+								key={`${it.id}-line`}
 								x1={`${(it.x * 120 + offset * 0.05) % 100}%`}
 								y1={it.y * 160}
-								x2={`${(logos[logos.indexOf(it) + 1].x * 120 + offset * 0.05) % 100}%`}
-								y2={logos[logos.indexOf(it) + 1].y * 160}
+								x2={`${(logos[i + 1].x * 120 + offset * 0.05) % 100}%`}
+								y2={logos[i + 1].y * 160}
 								stroke="url(#constLine)"
 								strokeWidth="1"
 							/>
@@ -63,40 +113,67 @@ function ConstellationBand({ v }: { v: number }) {
 			</svg>
 			{logos.map((it) => (
 				<div
-					key={it.n}
+					key={it.id}
 					style={{
 						position: "absolute",
 						left: `${(((it.x * 120 + offset * 0.05) % 100) + 100) % 100}%`,
-						top: it.y * 160 - 16,
+						top: it.y * 160,
 						transition: "transform .6s cubic-bezier(.2,.7,.2,1)",
-						transform: `translateX(${v * 0.4}px)`,
+						transform: `translate(-50%, -50%) translateX(${v * 0.4}px)`,
 					}}
 				>
 					<div
-						className="row center gap-8"
+						className="col center"
 						style={{
-							padding: "8px 14px",
-							background: "white",
-							borderRadius: 999,
+							padding: "10px 12px 12px",
+							minWidth: 72,
+							background: "none",
+							borderRadius: 16,
 							boxShadow:
 								"0 8px 24px -12px rgba(0,0,0,.12), 0 2px 6px -2px rgba(0,0,0,.06)",
 							border: "1px solid rgba(14,63,21,.08)",
-							fontSize: 13,
-							fontWeight: 500,
-							color: "var(--ink)",
-							whiteSpace: "nowrap",
+							gap: 2,
 						}}
 					>
+						{it.variant === "triple" ? (
+							<div
+								className="row center"
+								style={{ gap: 4, minHeight: 32, alignItems: "center" }}
+							>
+								{it.srcs.map((src) => (
+									<img
+										key={src}
+										src={src}
+										alt=""
+										draggable={false}
+										style={{ height: 22, width: 22, objectFit: "contain" }}
+									/>
+								))}
+							</div>
+						) : (
+							<img
+								src={it.src}
+								alt=""
+								draggable={false}
+								style={{
+									height: 60,
+									width: 80,
+									objectFit: "contain",
+								}}
+							/>
+						)}
 						<span
 							style={{
-								width: 8,
-								height: 8,
-								borderRadius: 2,
-								background: it.c,
-								boxShadow: `0 0 8px ${it.c}`,
+								fontSize: 15,
+								fontWeight: 600,
+								letterSpacing: "0.02em",
+								color: "var(--ink)",
+								textAlign: "center",
+								lineHeight: 1.2,
 							}}
-						/>
-						{it.n}
+						>
+							{it.label}
+						</span>
 					</div>
 				</div>
 			))}
