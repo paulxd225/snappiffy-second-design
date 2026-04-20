@@ -1,5 +1,7 @@
-import { useReveal } from '../hooks/use-reveal';
+
+import {useRef, useState } from 'react';
 import { Icons } from '../components/Icons';
+import { useReveal } from '../hooks/use-reveal';
 
 const items = [
   { k: '01', t: 'Significant savings', d: '70% cheaper development using low-code technologies where it makes sense.', ic: 'spark' as const },
@@ -9,20 +11,17 @@ const items = [
 ];
 
 function BenefitCard({ it, delay }: { it: typeof items[0]; delay: number }) {
-  const ref = useReveal();
+  const ref = useRef<HTMLButtonElement>(null);
   const IconEl = Icons[it.ic];
+  const [hovered, setHovered] = useState(false);
+  
   return (
-    <div ref={ref} className="reveal"
-      onMouseEnter={e => {
-        const el = e.currentTarget as HTMLDivElement;
-        el.style.transform = 'translateY(-6px)';
-        el.style.borderColor = 'rgba(155,92,255,0.35)';
-      }}
-      onMouseLeave={e => {
-        const el = e.currentTarget as HTMLDivElement;
-        el.style.transform = 'translateY(0)';
-        el.style.borderColor = 'rgba(255,255,255,0.07)';
-      }}
+    <button
+      ref={ref}
+      type="button"
+      className="reveal"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         '--d': `${delay}ms`,
         position: 'relative', padding: 28, borderRadius: 20,
@@ -31,6 +30,8 @@ function BenefitCard({ it, delay }: { it: typeof items[0]; delay: number }) {
         overflow: 'hidden',
         transition: 'transform .6s cubic-bezier(.2,.8,.2,1), border-color .3s',
         minHeight: 280,
+        transform: hovered ? 'translateY(-6px)' : 'translateY(0)',
+        borderColor: hovered ? 'rgba(155,92,255,0.35)' : 'rgba(255,255,255,0.07)',
       } as React.CSSProperties}>
       <div style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: 999, background: 'radial-gradient(circle, rgba(124,216,90,.2), transparent 70%)', pointerEvents: 'none' }}/>
       <div className="row between" style={{ marginBottom: 40 }}>
@@ -45,7 +46,7 @@ function BenefitCard({ it, delay }: { it: typeof items[0]; delay: number }) {
       </div>
       <h3 style={{ marginBottom: 14, color: 'white', fontWeight: 500 }}>{it.t}</h3>
       <p style={{ color: 'rgba(255,255,255,.62)', fontSize: 14.5, lineHeight: 1.55, margin: 0 }}>{it.d}</p>
-    </div>
+    </button>
   );
 }
 
@@ -66,7 +67,7 @@ export function Benefits() {
           </p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
-          {items.map((it, i) => <BenefitCard key={i} it={it} delay={i * 120}/>)}
+          {items.map((it) => <BenefitCard key={it.k} it={it} delay={items.indexOf(it) * 120}/>)}
         </div>
       </div>
     </section>

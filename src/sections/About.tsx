@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { Icons } from '../components/Icons';
 import { useReveal } from '../hooks/use-reveal';
 import { useScrollDirection } from '../hooks/use-scroll-direction';
-import { Icons } from '../components/Icons';
+
+
 
 const logos = [
   { n: 'Supabase', c: '#3ecf8e', x: 0.08, y: 0.2 },
@@ -21,6 +23,7 @@ function ConstellationBand({ v }: { v: number }) {
   return (
     <div style={{ position: 'relative', height: 160, width: '100%', overflow: 'hidden', borderBottom: '1px solid rgba(14,63,21,.08)', marginBottom: 20 }}>
       <svg width="100%" height="160" style={{ position: 'absolute', inset: 0, opacity: 0.2 }}>
+      <title>Tech Stack Constellation</title>
         <defs>
           <linearGradient id="constLine" x1="0" x2="1">
             <stop offset="0" stopColor="#1e7a24"/>
@@ -28,14 +31,14 @@ function ConstellationBand({ v }: { v: number }) {
           </linearGradient>
         </defs>
         {logos.map((it, i) => i < logos.length - 1 && (
-          <line key={i}
-            x1={`${(it.x * 120 + offset * 0.05) % 100}%`} y1={it.y * 160}
-            x2={`${(logos[i+1].x * 120 + offset * 0.05) % 100}%`} y2={logos[i+1].y * 160}
-            stroke="url(#constLine)" strokeWidth="1"/>
+          <line key={it.n}
+          x1={`${(it.x * 120 + offset * 0.05) % 100}%`} y1={it.y * 160}
+          x2={`${(logos[logos.indexOf(it)+1].x * 120 + offset * 0.05) % 100}%`} y2={logos[logos.indexOf(it)+1].y * 160}
+          stroke="url(#constLine)" strokeWidth="1"/>
         ))}
       </svg>
-      {logos.map((it, i) => (
-        <div key={i} style={{
+      {logos.map((it)  => (
+        <div key={it.n} style={{
           position: 'absolute',
           left: `${((it.x * 120 + offset * 0.05) % 100 + 100) % 100}%`,
           top: it.y * 160 - 16,
@@ -80,7 +83,7 @@ function VideoCard() {
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}/>
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(14,63,21,.2), rgba(14,63,21,.55))' }}/>
           <div style={{ position: 'absolute', inset: 0, borderRadius: 24, boxShadow: 'inset 0 0 0 1px rgba(124,216,90,.3), inset 0 0 60px rgba(155,92,255,.15)', pointerEvents: 'none' }}/>
-          <button onClick={() => setPlaying(true)} style={{
+          <button type="button" onClick={() => setPlaying(true)} style={{
             position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
             width: 84, height: 84, borderRadius: 999,
             background: 'rgba(255,255,255,.95)',
@@ -88,8 +91,14 @@ function VideoCard() {
             boxShadow: '0 10px 30px -10px rgba(0,0,0,.3), 0 0 0 8px rgba(255,255,255,.1)',
             transition: 'transform .3s',
           }}
-            onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.transform = 'translate(-50%, -50%) scale(1.08)'}
-            onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.transform = 'translate(-50%, -50%) scale(1)'}>
+          onMouseEnter={(e) => {
+            const btn = e.currentTarget;
+            btn.style.transform = 'translate(-50%, -50%) scale(1.08)';
+          }}
+          onMouseLeave={(e) => {
+            const btn = e.currentTarget;
+            btn.style.transform = 'translate(-50%, -50%) scale(1)';
+          }}>
             <Icons.play style={{ width: 26, height: 26, color: '#0e3f15', marginLeft: 4 }}/>
           </button>
         </>
@@ -127,8 +136,8 @@ export function About() {
                 { k: '10x', l: 'more efficiency in processes' },
                 { k: '$170K', s: '/yr', l: 'average savings' },
                 { k: '80%+', l: 'process optimization' },
-              ].map((s, i) => (
-                <div key={i} style={{ flex: 1, padding: '28px 16px 0 0', borderRight: i < 2 ? '1px solid rgba(14,63,21,.12)' : 'none', paddingLeft: i > 0 ? 24 : 0 }}>
+              ].map((s) => (
+                <div key={s.k} style={{ flex: 1, padding: '28px 16px 0 0', borderRight: s.k !== '80%+' ? '1px solid rgba(14,63,21,.12)' : 'none', paddingLeft: s.k !== '10x' ?  24 : 0 }}>
                   <div style={{ fontSize: 36, fontWeight: 600, color: 'var(--green-700)', letterSpacing: '-0.03em' }}>{s.k}<span style={{ fontSize: 16, color: 'var(--green-600)', fontFamily: 'var(--mono)' }}>{s.s || ''}</span></div>
                   <div style={{ fontSize: 12, color: 'rgba(7,18,9,0.55)', marginTop: 4 }}>{s.l}</div>
                 </div>
