@@ -1,21 +1,29 @@
-import { Button } from "@/components/ui/button"
+import { Header } from './sections/Header';
+import { Hero } from './sections/Hero';
+import { About } from './sections/About';
+import { Benefits } from './sections/Benefits';
+import { Services } from './sections/Services';
+import { CaseStudy } from './sections/CaseStudy';
+import { Projects } from './sections/Projects';
+import { Industries } from './sections/Industries';
+import { Timeline } from './sections/Timeline';
+import { FAQ } from './sections/FAQ';
+import { Footer } from './sections/Footer';
 
-export function App() {
+export default function App() {
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-      </div>
-    </div>
-  )
+    <>
+      <Header/>
+      <Hero/>
+      <About/>
+      <Benefits/>
+      <Services/>
+      <CaseStudy/>
+      <Projects/>
+      <Industries/>
+      <Timeline/>
+      <FAQ/>
+      <Footer/>
+    </>
+  );
 }
-
-export default App
