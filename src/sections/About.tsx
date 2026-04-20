@@ -1,6 +1,4 @@
-
 import { useEffect, useState } from 'react';
-
 import { Icons } from '../components/Icons';
 import { useReveal } from '../hooks/use-reveal';
 import { useScrollDirection } from '../hooks/use-scroll-direction';

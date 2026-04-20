@@ -1,7 +1,6 @@
-import React from 'react';
 import { useEffect, useState } from 'react';
-import { Logo } from '../components/Logo';
 import { Icons } from '../components/Icons';
+import { Logo } from '../components/Logo';
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
