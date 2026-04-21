@@ -1,10 +1,29 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import cilantro1 from "../assets/apps-examples/cilantro1.png";
+import cilantro2 from "../assets/apps-examples/cilantro2.png";
+import cilantro3 from "../assets/apps-examples/cilantro3.png";
+import cilantro4 from "../assets/apps-examples/cilantro4.png";
+import cilantro5 from "../assets/apps-examples/cilantro5.png";
+import cilantrologo from "../assets/apps-examples/cilantrologo.webp";
+import enterprises1 from "../assets/apps-examples/enterprises1.png";
+import enterprises2 from "../assets/apps-examples/enterprises2.png";
+import enterprises3 from "../assets/apps-examples/enterprises3.png";
+import enterprises4 from "../assets/apps-examples/enterprises4.png";
+import enterprises5 from "../assets/apps-examples/enterprises5.png";
+import enterpriseslogo from "../assets/apps-examples/enterpriseslogo.png";
 import ochurros1 from "../assets/apps-examples/ochurros1.webp";
 import ochurros2 from "../assets/apps-examples/ochurros2.webp";
 import ochurros3 from "../assets/apps-examples/ochurros3.webp";
 import ochurros4 from "../assets/apps-examples/ochurros4.webp";
 import ochurros5 from "../assets/apps-examples/ochurros5.webp";
+import ochurroslogo from "../assets/apps-examples/ochurroslogo.png";
+import shapewear1 from "../assets/apps-examples/shapewear1.png";
+import shapewear2 from "../assets/apps-examples/shapewear2.png";
+import shapewear3 from "../assets/apps-examples/shapewear3.png";
+import shapewear4 from "../assets/apps-examples/shapewear4.png";
+import shapewear5 from "../assets/apps-examples/shapewear5.png";
+import shapewearlogo from "../assets/apps-examples/shapewearlogo.png";
 import { useLanguage } from "../i18n/LanguageContext";
 
 const navBtnStyle: React.CSSProperties = {
@@ -20,8 +39,20 @@ const navBtnStyle: React.CSSProperties = {
 
 const CASE_APP_LAYOUT = [
 	{
-		color: "#ff3df0",
+		color: "#7cd85a",
+		accent: "#2ea02c",
+		screens: [
+			{ theme: "dark", palette: "#7cd85a" },
+			{ theme: "dark", palette: "#2ea02c" },
+			{ theme: "light", palette: "#7cd85a" },
+			{ theme: "dark", palette: "#2ea02c" },
+			{ theme: "dark", palette: "#4cc23a" },
+		],
+	},
+	{
+		color: "#FFBFFB",
 		accent: "#c084ff",
+		logo: ochurroslogo,
 		screens: [
 			{ theme: "light", palette: "#ff3df0", image: ochurros1 },
 			{ theme: "light", palette: "#ff7ae3", image: ochurros2 },
@@ -31,25 +62,39 @@ const CASE_APP_LAYOUT = [
 		],
 	},
 	{
-		color: "#c084ff",
-		accent: "#9b5cff",
+		color: "#052E85",
+		accent: "#0044cc",
+		logo: enterpriseslogo,
 		screens: [
-			{ theme: "dark", palette: "#9b5cff" },
-			{ theme: "light", palette: "#c084ff" },
-			{ theme: "dark", palette: "#9b5cff" },
-			{ theme: "light", palette: "#c084ff" },
-			{ theme: "dark", palette: "#9b5cff" },
+			{ theme: "light", palette: "#1e6bff", image: enterprises1 },
+			{ theme: "dark", palette: "#4d8fff", image: enterprises2 },
+			{ theme: "light", palette: "#0066ff", image: enterprises3 },
+			{ theme: "dark", palette: "#1e6bff", image: enterprises4 },
+			{ theme: "light", palette: "#4d8fff", image: enterprises5 },
 		],
 	},
 	{
-		color: "#7cd85a",
-		accent: "#2ea02c",
+		color: "#7A651D",
+		accent: "#8b6914",
+		logo: shapewearlogo,
 		screens: [
-			{ theme: "dark", palette: "#7cd85a" },
-			{ theme: "dark", palette: "#2ea02c" },
-			{ theme: "light", palette: "#7cd85a" },
-			{ theme: "dark", palette: "#2ea02c" },
-			{ theme: "dark", palette: "#4cc23a" },
+			{ theme: "light", palette: "#c9a227", image: shapewear1 },
+			{ theme: "dark", palette: "#d4b84a", image: shapewear2 },
+			{ theme: "light", palette: "#e6c84a", image: shapewear3 },
+			{ theme: "dark", palette: "#c9a227", image: shapewear4 },
+			{ theme: "light", palette: "#8b6914", image: shapewear5 },
+		],
+	},
+	{
+		color: "#0f0f0f",
+		accent: "#000",
+		logo: cilantrologo,
+		screens: [
+			{ theme: "dark", palette: "#2d6a4f", image: cilantro1 },
+			{ theme: "light", palette: "#40916c", image: cilantro2 },
+			{ theme: "dark", palette: "#1b4332", image: cilantro3 },
+			{ theme: "light", palette: "#2d6a4f", image: cilantro4 },
+			{ theme: "dark", palette: "#40916c", image: cilantro5 },
 		],
 	},
 ] as const;
@@ -62,6 +107,7 @@ type App = {
 	desc: string;
 	color: string;
 	accent: string;
+	logo?: string;
 	screens: Screen[];
 };
 
@@ -327,7 +373,7 @@ function PhonesStrip({ app }: { app: App }) {
 		>
 			{app.screens.map((s, k) => (
 				<div
-					key={`${k}-${s.label}`}
+					key={`${app.name}-${s.label}`}
 					style={{
 						flex: "0 0 auto",
 						scrollSnapAlign: "center",
@@ -348,9 +394,11 @@ export function CaseStudy() {
 		() =>
 			CASE_APP_LAYOUT.map((layout, i) => {
 				const copy = messages.caseStudy.apps[i];
+				const logo = "logo" in layout ? layout.logo : undefined;
 				return {
 					color: layout.color,
 					accent: layout.accent,
+					logo,
 					name: copy.name,
 					client: copy.client,
 					who: copy.who,
@@ -372,13 +420,13 @@ export function CaseStudy() {
 		if (!apps[idx]) return;
 		timer.current = setTimeout(
 			() => setIdx((v) => (v + 1) % apps.length),
-			6000,
+			4500,
 		);
 		return () => {
 			const id = timer.current;
 			if (id !== null) clearTimeout(id);
 		};
-	}, [idx, auto]);
+	}, [idx, auto, apps, apps.length]);
 
 	const go = (d: number) => {
 		setAuto(false);
@@ -438,7 +486,9 @@ export function CaseStudy() {
 							className="btn btn-ghost"
 							style={{ padding: "10px 16px", fontSize: 13 }}
 						>
-							{auto ? messages.caseStudy.autoplayOn : messages.caseStudy.autoplayOff}
+							{auto
+								? messages.caseStudy.autoplayOn
+								: messages.caseStudy.autoplayOff}
 						</button>
 						<div className="row gap-8">
 							<button type="button" onClick={() => go(-1)} style={navBtnStyle}>
@@ -477,9 +527,23 @@ export function CaseStudy() {
 									fontWeight: 700,
 									fontSize: 22,
 									boxShadow: `0 10px 30px -10px ${app.color}`,
+									overflow: "hidden",
 								}}
 							>
-								{app.name[0]}
+								{app.logo ? (
+									<img
+										src={app.logo}
+										alt=""
+										draggable={false}
+										style={{
+											width: "78%",
+											height: "78%",
+											objectFit: "contain",
+										}}
+									/>
+								) : (
+									app.name[0]
+								)}
 							</div>
 							<div>
 								<div style={{ fontSize: 24, fontWeight: 500, color: "white" }}>
@@ -554,7 +618,7 @@ export function CaseStudy() {
 									letterSpacing: "0.1em",
 									transition: "all .3s",
 									textAlign: "left",
-									minWidth: 140,
+									minWidth: 0,
 								}}
 							>
 								<div className="mono" style={{ fontSize: 9, opacity: 0.6 }}>
@@ -587,7 +651,7 @@ export function CaseStudy() {
 												width: "100%",
 												height: "100%",
 												background: a.color,
-												animation: "progFill 6s linear",
+												animation: "progFill 4.5s linear",
 												transformOrigin: "left",
 											}}
 										/>
