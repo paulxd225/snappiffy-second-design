@@ -24,7 +24,7 @@ import shapewear3 from "../assets/apps-examples/shapewear3.png";
 import shapewear4 from "../assets/apps-examples/shapewear4.png";
 import shapewear5 from "../assets/apps-examples/shapewear5.png";
 import shapewearlogo from "../assets/apps-examples/shapewearlogo.png";
-import { useLanguage } from "../i18n/LanguageContext";
+import { useLanguage } from "../i18n/LanguageContext.tsx";
 
 const navBtnStyle: React.CSSProperties = {
 	width: 44,
