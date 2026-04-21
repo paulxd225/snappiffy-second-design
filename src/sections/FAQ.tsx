@@ -1,128 +1,34 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
+import { useLanguage } from "../i18n/LanguageContext";
 
 type QA = { q: string; a: string };
-
-const general: QA[] = [
-	{
-		q: "How much time does it take to develop my app?",
-		a: "It depends on complexity, but we can usually start shipping in around 4 weeks. We scope upfront so you know the exact roadmap before we start.",
-	},
-	{
-		q: "What types of projects are you able to do?",
-		a: "Every concept, really. Mobile apps, web apps, dashboards, marketplaces, AI integrations, automation pipelines. If it runs on software, we can build it.",
-	},
-	{
-		q: "Do you work with international clients?",
-		a: "Yes. Most of our work is remote. On-site visits are only available within Ohio, but everything else is handled via video calls and our client portal.",
-	},
-	{
-		q: "What is your pricing model?",
-		a: "Fixed scope, fixed price for the first version. Starting at $3,999 depending on complexity. Follow-on work is monthly retainer or milestone-based — you choose.",
-	},
-	{
-		q: "Do you help with ongoing maintenance?",
-		a: "Of course. Handoff isn't the end. We offer maintenance plans so you have a team on-call when something breaks, when the app store updates, or when you want new features.",
-	},
-	{
-		q: "Who owns the code?",
-		a: "You do. 100%. Full source handover at the end of every project, documented and ready for any team to take over.",
-	},
-];
-
-const pricing: QA[] = [
-	{
-		q: "How do you estimate cost before we start?",
-		a: "We align on goals, user flows, and integrations, then package a fixed scope with a clear milestone plan. You get a written estimate and timeline before any build work begins.",
-	},
-	{
-		q: "What's included in the starting price vs add-ons?",
-		a: "The starting package covers design, development, QA, and a production launch for the agreed feature set. Add-ons are things like extra platforms, advanced AI, or third-party certifications — quoted separately.",
-	},
-	{
-		q: "Do you charge for revisions during the build?",
-		a: "Reasonable iterations inside the agreed scope are included. If priorities shift into new features or a major pivot, we document the delta and price it as a change request so there are no surprises.",
-	},
-	{
-		q: "How do deposits and milestones work?",
-		a: "We typically split payments across milestones — kickoff, core build, and launch — so cash flow matches delivery. Exact splits are spelled out in the proposal you approve up front.",
-	},
-	{
-		q: "Can we start smaller and expand later?",
-		a: "Yes. Many teams ship an MVP first, then fund phases two and three from traction. We architect with that path in mind so growth doesn't mean a rewrite.",
-	},
-	{
-		q: "What happens if we pause or cancel mid-project?",
-		a: "Work billed to the current milestone is due; we hand over what's completed along with notes and access. If you return later, we pick up from the last agreed checkpoint.",
-	},
-];
-
-const process: QA[] = [
-	{
-		q: "What happens right after we sign?",
-		a: "We schedule a kickoff, confirm stakeholders, and set up your client portal with milestones, files, and weekly updates. Engineering starts once access and assets are in place.",
-	},
-	{
-		q: "How will we track progress day to day?",
-		a: "You'll see tasks move across stages in the portal, plus a standing summary of what's done, what's next, and any decisions waiting on you.",
-	},
-	{
-		q: "Who is our main point of contact?",
-		a: "A dedicated project manager coordinates design, engineering, and QA. Technical questions route to the right specialist without you chasing individuals.",
-	},
-	{
-		q: "How often do we meet or get updates?",
-		a: "Most teams prefer a weekly sync plus async updates in the portal. If we're in a crunch week, we can temporarily increase touchpoints.",
-	},
-	{
-		q: "What do you need from us to move fast?",
-		a: "Brand assets, access to any APIs or accounts, product decisions, and timely feedback on reviews. A single approver on your side removes bottlenecks.",
-	},
-	{
-		q: "How is QA and launch handled?",
-		a: "We run structured QA, a UAT window with you, then deploy to production with monitoring and rollback notes. Post-launch we stay close for stabilization.",
-	},
-];
-
-const support: QA[] = [
-	{
-		q: "What's included in a maintenance plan?",
-		a: "Security patches, dependency updates, small bug fixes, store compliance updates, and a monthly health check. Larger features are scoped as separate work.",
-	},
-	{
-		q: "How fast can you respond to incidents?",
-		a: "Critical production issues are triaged immediately during business hours, with a clear escalation path. Exact targets are defined in your maintenance tier.",
-	},
-	{
-		q: "Do you help with app store rejections or reviews?",
-		a: "Yes — we prepare metadata, screenshots, and review notes, then iterate with you if Apple or Google requests changes.",
-	},
-	{
-		q: "Can you train our team on the codebase?",
-		a: "We provide walkthrough sessions, READMEs, and environment setup docs. If you onboard engineers later, we can do a focused handoff workshop.",
-	},
-	{
-		q: "How do we request new features after launch?",
-		a: "Open a ticket in the portal or email your PM. We'll estimate impact, schedule it against your retainer or quote a milestone if it's larger.",
-	},
-	{
-		q: "Is there an SLA for production outages?",
-		a: "Maintenance tiers include defined response windows for production-down events. Non-production or cosmetic issues are handled in the regular queue.",
-	},
-];
-
-const cats = ["General", "Pricing", "Process", "Support"] as const;
-const faqSets: QA[][] = [general, pricing, process, support];
 
 const ANSWER_MAX_PX = 360;
 
 export function FAQ() {
+	const { messages, locale } = useLanguage();
+	const faqSets = useMemo<QA[][]>(
+		() => [
+			messages.faq.general,
+			messages.faq.pricing,
+			messages.faq.process,
+			messages.faq.support,
+		],
+		[messages],
+	);
+	const cats = messages.faq.categories;
 	const ref = useReveal();
 	const [open, setOpen] = useState(-1);
 	const [cat, setCat] = useState(0);
-	const items = faqSets[cat];
-	const activeCat = cats[cat];
+	const items = faqSets[cat] ?? faqSets[0];
+	const activeCat = cats[cat] ?? cats[0];
+
+	useEffect(() => {
+		setOpen(-1);
+		setCat(0);
+	}, [locale]);
 
 	return (
 		<section
@@ -154,12 +60,12 @@ export function FAQ() {
 				>
 					<div style={{ flex: "0 0 340px" }}>
 						<div className="eyebrow" style={{ marginBottom: 20 }}>
-							FAQ
+							{messages.faq.eyebrow}
 						</div>
 						<h2 style={{ marginBottom: 24 }}>
-							Questions? <br />
+							{messages.faq.titleBefore} <br />
 							<span className="serif-italic" style={{ color: "#c084ff" }}>
-								We have answers.
+								{messages.faq.titleHighlight}
 							</span>
 						</h2>
 						<p
@@ -170,8 +76,7 @@ export function FAQ() {
 								marginBottom: 28,
 							}}
 						>
-							Can't find what you're looking for? Book a discovery call and
-							we'll answer directly.
+							{messages.faq.intro}
 						</p>
 						<div className="col gap-8" style={{ marginBottom: 28 }}>
 							{cats.map((c, i) => (
@@ -212,7 +117,7 @@ export function FAQ() {
 							className="btn btn-primary"
 							style={{ padding: "12px 20px" }}
 						>
-							Ask a question{" "}
+							{messages.faq.askQuestion}{" "}
 							<Icons.arrow className="chev" style={{ width: 14, height: 14 }} />
 						</a>
 					</div>

@@ -1,6 +1,9 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Icons } from "../components/Icons";
 import { Logo } from "../components/Logo";
+import { LANGUAGE_OPTIONS, optionForLocale } from "../i18n/languages";
+import { useLanguage } from "../i18n/LanguageContext";
+import type { Locale } from "../i18n/types";
 
 const MOBILE_MQ = "(max-width: 900px)";
 
@@ -18,11 +21,122 @@ function getMobileServerSnapshot() {
 	return false;
 }
 
-function linkSlug(label: string) {
-	return label.toLowerCase().replace(" ", "-");
+function LanguagePicker({
+	onPick,
+	align = "end",
+}: {
+	onPick?: () => void;
+	align?: "start" | "end";
+}) {
+	const { locale, setLocale, messages } = useLanguage();
+	const [open, setOpen] = useState(false);
+	const rootRef = useRef<HTMLDivElement>(null);
+	const cur = optionForLocale(locale);
+
+	useEffect(() => {
+		if (!open) return;
+		const onPointer = (e: PointerEvent) => {
+			const el = rootRef.current;
+			if (el && !el.contains(e.target as Node)) setOpen(false);
+		};
+		document.addEventListener("pointerdown", onPointer, true);
+		return () => document.removeEventListener("pointerdown", onPointer, true);
+	}, [open]);
+
+	useEffect(() => {
+		if (!open) return;
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === "Escape") setOpen(false);
+		};
+		document.addEventListener("keydown", onKey);
+		return () => document.removeEventListener("keydown", onKey);
+	}, [open]);
+
+	return (
+		<div ref={rootRef} style={{ position: "relative" }}>
+			<button
+				type="button"
+				aria-haspopup="listbox"
+				aria-expanded={open}
+				aria-label={messages.header.languageMenu}
+				onClick={() => setOpen((v) => !v)}
+				className="row center gap-8"
+				style={{
+					color: "var(--paper)",
+					fontSize: 13,
+					fontFamily: "var(--mono)",
+					letterSpacing: "0.1em",
+					border: "none",
+					background: "transparent",
+					cursor: "pointer",
+					padding: "6px 4px",
+				}}
+			>
+				<Icons.globe style={{ width: 16, height: 16 }} />
+				{cur.flag} {cur.code}
+			</button>
+			{open ? (
+				<div
+					role="listbox"
+					aria-label={messages.header.languageMenu}
+					style={{
+						position: "absolute",
+						top: "calc(100% + 8px)",
+						...(align === "end" ? { right: 0 } : { left: 0 }),
+						minWidth: 220,
+						zIndex: 80,
+						borderRadius: 12,
+						border: "1px solid rgba(255,255,255,.12)",
+						background: "var(--paper)",
+						boxShadow: "0 16px 48px rgba(0,0,0,.35)",
+						padding: 6,
+					}}
+				>
+					{LANGUAGE_OPTIONS.map((opt) => (
+						<button
+							key={opt.locale}
+							type="button"
+							role="option"
+							aria-selected={opt.locale === locale}
+							onMouseDown={(e) => e.preventDefault()}
+							onClick={() => {
+								setLocale(opt.locale as Locale);
+								setOpen(false);
+								onPick?.();
+							}}
+							style={{
+								display: "flex",
+								width: "100%",
+								alignItems: "center",
+								gap: 10,
+								padding: "10px 12px",
+								border: "none",
+								borderRadius: 8,
+								background:
+									opt.locale === locale
+										? "rgba(124,216,90,.2)"
+										: "transparent",
+								color: "var(--ink)",
+								fontSize: 14,
+								textAlign: "left",
+								cursor: "pointer",
+							}}
+						>
+							<span style={{ fontSize: 16 }}>{opt.flag}</span>
+							<span className="mono" style={{ opacity: 0.75, minWidth: 40 }}>
+								{opt.code}
+							</span>
+							<span style={{ flex: 1 }}>{opt.label}</span>
+						</button>
+					))}
+				</div>
+			) : null}
+		</div>
+	);
 }
 
 export function Header() {
+	const { messages } = useLanguage();
 	const isMobile = useSyncExternalStore(
 		subscribeMobile,
 		getMobileSnapshot,
@@ -60,15 +174,15 @@ export function Header() {
 		return () => window.removeEventListener("keydown", onKey);
 	}, [isMobile, menuOpen]);
 
-	const links = [
-		"Home",
-		"About",
-		"Services",
-		"Case Study",
-		"Catalogue",
-		"Process",
-		"Industries",
-		"FAQ",
+	const nav = [
+		{ slug: "home", label: messages.nav.home },
+		{ slug: "about", label: messages.nav.about },
+		{ slug: "services", label: messages.nav.services },
+		{ slug: "case-study", label: messages.nav.caseStudy },
+		{ slug: "catalogue", label: messages.nav.catalogue },
+		{ slug: "process", label: messages.nav.process },
+		{ slug: "industries", label: messages.nav.industries },
+		{ slug: "faq", label: messages.nav.faq },
 	];
 
 	const headerPadding = isMobile
@@ -152,10 +266,10 @@ export function Header() {
 							backdropFilter: "blur(12px)",
 						}}
 					>
-						{links.map((l, i) => (
+						{nav.map((item, i) => (
 							<a
-								key={l}
-								href={`#${linkSlug(l)}`}
+								key={item.slug}
+								href={`#${item.slug}`}
 								style={{
 									padding: "8px 14px",
 									fontSize: 13,
@@ -179,7 +293,7 @@ export function Header() {
 											"transparent";
 								}}
 							>
-								{l}
+								{item.label}
 							</a>
 						))}
 					</nav>
@@ -187,7 +301,7 @@ export function Header() {
 					{isMobile ? (
 						<button
 							type="button"
-							aria-label={menuOpen ? "Close menu" : "Open menu"}
+							aria-label={menuOpen ? messages.header.closeMenu : messages.header.openMenu}
 							aria-expanded={menuOpen}
 							onClick={() => setMenuOpen((v) => !v)}
 							style={{
@@ -210,24 +324,13 @@ export function Header() {
 						</button>
 					) : (
 						<div className="row center gap-12">
-							<button
-								type="button"
-								className="row center gap-8"
-								style={{
-									color: "var(--paper)",
-									fontSize: 13,
-									fontFamily: "var(--mono)",
-									letterSpacing: "0.1em",
-								}}
-							>
-								<Icons.globe style={{ width: 16, height: 16 }} /> EN
-							</button>
+							<LanguagePicker align="end" />
 							<a
 								href="#contact"
 								className="btn btn-primary"
 								style={{ padding: "10px 18px", fontSize: 13 }}
 							>
-								Book a visit{" "}
+								{messages.header.bookVisit}{" "}
 								<Icons.arrow className="chev" style={{ width: 14, height: 14 }} />
 							</a>
 						</div>
@@ -249,7 +352,7 @@ export function Header() {
 				>
 					<button
 						type="button"
-						aria-label="Close menu"
+						aria-label={messages.header.closeMenu}
 						onClick={() => setMenuOpen(false)}
 						style={{
 							flex: "1 1 auto",
@@ -265,7 +368,9 @@ export function Header() {
 						aria-modal="true"
 						style={{
 							flex: "0 0 auto",
-							width: "min(420px, 92vw)",
+							width: "50vw",
+							maxWidth: "50vw",
+							minWidth: 0,
 							height: "100%",
 							background: "rgba(7,18,9,0.92)",
 							borderLeft: "1px solid rgba(255,255,255,0.08)",
@@ -278,11 +383,11 @@ export function Header() {
 					>
 						<div className="row between center" style={{ gap: 12 }}>
 							<div style={{ color: "var(--paper)", fontWeight: 600, fontSize: 14 }}>
-								Menu
+								{messages.header.menu}
 							</div>
 							<button
 								type="button"
-								aria-label="Close menu"
+								aria-label={messages.header.closeMenu}
 								onClick={() => setMenuOpen(false)}
 								style={{
 									width: 40,
@@ -300,10 +405,10 @@ export function Header() {
 						</div>
 
 						<div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-							{links.map((l, i) => (
+							{nav.map((item, i) => (
 								<a
-									key={l}
-									href={`#${linkSlug(l)}`}
+									key={item.slug}
+									href={`#${item.slug}`}
 									onClick={() => setMenuOpen(false)}
 									style={{
 										padding: "12px 12px",
@@ -319,30 +424,18 @@ export function Header() {
 										textDecoration: "none",
 									}}
 								>
-									{l}
+									{item.label}
 								</a>
 							))}
 						</div>
 
 						<div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 10 }}>
-							<button
-								type="button"
-								className="row center gap-8"
-								style={{
-									width: "100%",
-									justifyContent: "center",
-									padding: "12px 12px",
-									borderRadius: 14,
-									border: "1px solid rgba(255,255,255,0.10)",
-									background: "rgba(255,255,255,0.04)",
-									color: "var(--paper)",
-									fontSize: 13,
-									fontFamily: "var(--mono)",
-									letterSpacing: "0.1em",
-								}}
-							>
-								<Icons.globe style={{ width: 16, height: 16 }} /> EN
-							</button>
+							<div style={{ display: "flex", justifyContent: "center" }}>
+								<LanguagePicker
+									align="start"
+									onPick={() => setMenuOpen(false)}
+								/>
+							</div>
 							<button
 								type="button"
 								className="btn btn-primary"
@@ -360,7 +453,8 @@ export function Header() {
 									gap: 8,
 								}}
 							>
-								Book a visit <Icons.arrow className="chev" style={{ width: 14, height: 14 }} />
+								{messages.header.bookVisit}{" "}
+								<Icons.arrow className="chev" style={{ width: 14, height: 14 }} />
 							</button>
 						</div>
 					</div>

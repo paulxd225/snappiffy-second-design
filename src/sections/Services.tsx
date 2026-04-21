@@ -1,50 +1,28 @@
+import { useMemo } from "react";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
+import { useLanguage } from "../i18n/LanguageContext";
 
 type VisualKind = "phones" | "browser" | "dash" | "ai" | "commerce";
 
-const items: Array<{
+type ServiceItem = {
 	t: string;
 	d: string;
 	cols: number;
 	rows: number;
 	visual: VisualKind;
+};
+
+const SERVICE_LAYOUT: Array<{
+	cols: number;
+	rows: number;
+	visual: VisualKind;
 }> = [
-	{
-		t: "Custom mobile apps",
-		d: "iOS & Android native-grade. Built with Flutter or React Native depending on what serves your team best.",
-		cols: 2,
-		rows: 2,
-		visual: "phones",
-	},
-	{
-		t: "Stunning websites",
-		d: "Brand-forward, fast, and easy to update. Shipped in a few weeks.",
-		cols: 2,
-		rows: 1,
-		visual: "browser",
-	},
-	{
-		t: "Internal dashboards",
-		d: "Replace spreadsheets and ops chaos with a single, clean interface for your team.",
-		cols: 1,
-		rows: 2,
-		visual: "dash",
-	},
-	{
-		t: "AI integrations",
-		d: "Co-pilots, doc extraction, routing, classification — embedded inside your app.",
-		cols: 1,
-		rows: 1,
-		visual: "ai",
-	},
-	{
-		t: "E-commerce",
-		d: "Catalog, payments, coupons, push — all in one.",
-		cols: 2,
-		rows: 1,
-		visual: "commerce",
-	},
+	{ cols: 2, rows: 2, visual: "phones" },
+	{ cols: 2, rows: 1, visual: "browser" },
+	{ cols: 1, rows: 2, visual: "dash" },
+	{ cols: 1, rows: 1, visual: "ai" },
+	{ cols: 2, rows: 1, visual: "commerce" },
 ];
 
 function Visual({ kind }: { kind: VisualKind }) {
@@ -426,7 +404,7 @@ function Visual({ kind }: { kind: VisualKind }) {
 	return null;
 }
 
-function ServiceCell({ it, i }: { it: (typeof items)[0]; i: number }) {
+function ServiceCell({ it, i }: { it: ServiceItem; i: number }) {
 	const ref = useReveal();
 	return (
 		<div
@@ -485,6 +463,15 @@ function ServiceCell({ it, i }: { it: (typeof items)[0]; i: number }) {
 }
 
 export function Services() {
+	const { messages } = useLanguage();
+	const items = useMemo<ServiceItem[]>(
+		() =>
+			SERVICE_LAYOUT.map((layout, i) => ({
+				...layout,
+				...messages.services.items[i],
+			})),
+		[messages],
+	);
 	const ref = useReveal();
 	return (
 		<section
@@ -503,12 +490,12 @@ export function Services() {
 				>
 					<div>
 						<div className="eyebrow" style={{ marginBottom: 20 }}>
-							Our services
+							{messages.services.eyebrow}
 						</div>
 						<h2 style={{ color: "var(--ink)", maxWidth: 900 }}>
-							We provide solutions{" "}
+							{messages.services.titleBefore}{" "}
 							<span className="serif-italic" style={{ color: "#9b5cff" }}>
-								for every need in the market.
+								{messages.services.titleHighlight}
 							</span>
 						</h2>
 					</div>
@@ -521,7 +508,7 @@ export function Services() {
 							background: "white",
 						}}
 					>
-						Full catalogue{" "}
+						{messages.services.catalogue}{" "}
 						<Icons.arrow className="chev" style={{ width: 14, height: 14 }} />
 					</a>
 				</div>
@@ -535,7 +522,7 @@ export function Services() {
 					}}
 				>
 					{items.map((it, i) => (
-						<ServiceCell key={it.t} it={it} i={i} />
+						<ServiceCell key={`${it.visual}-${i}`} it={it} i={i} />
 					))}
 				</div>
 			</div>

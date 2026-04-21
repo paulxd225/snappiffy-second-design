@@ -1,5 +1,6 @@
-import { useRef, useSyncExternalStore } from "react";
+import { useMemo, useRef, useSyncExternalStore } from "react";
 import { useScrollProgress } from "../hooks/use-scroll-progress";
+import { useLanguage } from "../i18n/LanguageContext";
 
 const MOBILE_MQ = "(max-width: 900px)";
 
@@ -21,38 +22,32 @@ import timeline1 from "../assets/timeline1.png";
 import timeline2 from "../assets/timeline2.png";
 import timeline3 from "../assets/timeline3.png";
 
-const steps = [
-	{
-		k: "01",
-		t: "Schedule a call or visit",
-		d: "Book a discovery call or in-person visit (Only in Ohio) to deeply understand your needs and business process. We'll create an action plan letting you know scope, timeline, budget and deliverables.",
-		side: "right" as const,
-		image: timeline1,
-	},
-	{
-		k: "02",
-		t: "Let's do it",
-		d: "Once the agreement is approved, we begin the process. Follow up at any stage through our client portal or your designated project manager.",
-		side: "left" as const,
-		image: timeline2,
-	},
-	{
-		k: "03",
-		t: "Delivery & handoff",
-		d: "We'll have a handoff call where we walk through how the software works and how your project was built. Our support doesn't end there — we stay on.",
-		side: "right" as const,
-		image: timeline3,
-	},
-];
+const STEP_LAYOUT = [
+	{ k: "01", side: "right" as const, image: timeline1 },
+	{ k: "02", side: "left" as const, image: timeline2 },
+	{ k: "03", side: "right" as const, image: timeline3 },
+] as const;
+
+type TimelineStepData = {
+	k: string;
+	t: string;
+	d: string;
+	side: "left" | "right";
+	image: string;
+};
 
 function TimelineStep({
 	s,
 	active,
 	isMobile,
+	stepWord,
+	visualWord,
 }: {
-	s: (typeof steps)[0];
+	s: TimelineStepData;
 	active: boolean;
 	isMobile: boolean;
+	stepWord: string;
+	visualWord: string;
 }) {
 	const circle = (
 		<div
@@ -103,7 +98,7 @@ function TimelineStep({
 					transition: "opacity .6s",
 				}}
 			>
-				STEP {s.k}
+				{stepWord} {s.k}
 			</div>
 			<h3
 				style={{
@@ -202,7 +197,7 @@ function TimelineStep({
 					zIndex: 3,
 				}}
 			>
-				STEP {s.k} VISUAL
+				{stepWord} {s.k} {visualWord}
 			</div>
 		</div>
 	);
@@ -273,6 +268,15 @@ function TimelineStep({
 }
 
 export function Timeline() {
+	const { messages } = useLanguage();
+	const steps = useMemo<TimelineStepData[]>(
+		() =>
+			STEP_LAYOUT.map((layout, i) => ({
+				...layout,
+				...messages.timeline.steps[i],
+			})),
+		[messages],
+	);
 	const sectionRef = useRef<HTMLElement>(null);
 	const p = useScrollProgress(sectionRef);
 	const isMobile = useSyncExternalStore(
@@ -319,14 +323,14 @@ export function Timeline() {
 							marginBottom: 20,
 						}}
 					>
-						Our process
+						{messages.timeline.eyebrow}
 					</div>
 					<h2 style={{ maxWidth: 800, margin: "0 auto" }}>
-						A simple,{" "}
+						{messages.timeline.titleBefore}{" "}
 						<span className="serif-italic" style={{ color: "#c084ff" }}>
-							three-step
+							{messages.timeline.titleHighlight}
 						</span>{" "}
-						process.
+						{messages.timeline.titleAfter}
 					</h2>
 				</div>
 				<div
@@ -380,6 +384,8 @@ export function Timeline() {
 							s={s}
 							active={p > i / steps.length + 0.05}
 							isMobile={isMobile}
+							stepWord={messages.timeline.stepWord}
+							visualWord={messages.timeline.visual}
 						/>
 					))}
 				</div>

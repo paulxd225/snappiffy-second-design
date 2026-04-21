@@ -1,6 +1,28 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Icons } from "../components/Icons";
 import { Logo } from "../components/Logo";
+import { useLanguage } from "../i18n/LanguageContext";
+
+const PHONE_COUNTRIES = [
+	{ dial: "+1", flag: "🇺🇸", label: "United States" },
+	{ dial: "+1", flag: "🇨🇦", label: "Canada" },
+	{ dial: "+44", flag: "🇬🇧", label: "United Kingdom" },
+	{ dial: "+34", flag: "🇪🇸", label: "Spain" },
+	{ dial: "+52", flag: "🇲🇽", label: "Mexico" },
+	{ dial: "+57", flag: "🇨🇴", label: "Colombia" },
+	{ dial: "+593", flag: "🇪🇨", label: "Ecuador" },
+	{ dial: "+58", flag: "🇻🇪", label: "Venezuela" },
+	{ dial: "+54", flag: "🇦🇷", label: "Argentina" },
+	{ dial: "+55", flag: "🇧🇷", label: "Brazil" },
+	{ dial: "+49", flag: "🇩🇪", label: "Germany" },
+	{ dial: "+33", flag: "🇫🇷", label: "France" },
+	{ dial: "+39", flag: "🇮🇹", label: "Italy" },
+	{ dial: "+351", flag: "🇵🇹", label: "Portugal" },
+	{ dial: "+61", flag: "🇦🇺", label: "Australia" },
+	{ dial: "+81", flag: "🇯🇵", label: "Japan" },
+	{ dial: "+86", flag: "🇨🇳", label: "China" },
+	{ dial: "+91", flag: "🇮🇳", label: "India" },
+] as const;
 
 function Input({
 	v,
@@ -76,7 +98,390 @@ function Input({
 	);
 }
 
+function PhoneField({
+	countryIdx,
+	onCountryIdx,
+	local,
+	onLocal,
+}: {
+	countryIdx: number;
+	onCountryIdx: (idx: number) => void;
+	local: string;
+	onLocal: (v: string) => void;
+}) {
+	const { messages } = useLanguage();
+	const f = messages.footer;
+	const [open, setOpen] = useState(false);
+	const [countryQuery, setCountryQuery] = useState("");
+	const [focusInput, setFocusInput] = useState(false);
+	const [focusTrigger, setFocusTrigger] = useState(false);
+	const [focusSearch, setFocusSearch] = useState(false);
+	const rootRef = useRef<HTMLDivElement>(null);
+	const searchInputRef = useRef<HTMLInputElement>(null);
+	const controlId = useId();
+	const listId = useId();
+	const searchId = useId();
+	const triggerId = useId();
+	const country = PHONE_COUNTRIES[countryIdx] ?? PHONE_COUNTRIES[0];
+	const hasVal = local.length > 0;
+	const fieldActive =
+		focusInput || focusTrigger || open || focusSearch;
+
+	const filteredCountries = useMemo(() => {
+		const q = countryQuery.trim().toLowerCase();
+		const entries = PHONE_COUNTRIES.map((c, idx) => ({ c, idx }));
+		if (!q) return entries;
+		const dialDigits = (d: string) => d.replace(/\D/g, "");
+		const matches = entries.filter(
+			({ c }) =>
+				c.label.toLowerCase().startsWith(q) ||
+				c.label.toLowerCase().includes(q) ||
+				dialDigits(c.dial).startsWith(q) ||
+				c.dial.toLowerCase().includes(q),
+		);
+		return matches.sort((a, b) => {
+			const al = a.c.label.toLowerCase();
+			const bl = b.c.label.toLowerCase();
+			const aStarts = al.startsWith(q);
+			const bStarts = bl.startsWith(q);
+			if (aStarts && !bStarts) return -1;
+			if (!aStarts && bStarts) return 1;
+			return al.localeCompare(bl);
+		});
+	}, [countryQuery]);
+
+	useEffect(() => {
+		if (!open) {
+			setCountryQuery("");
+			return;
+		}
+		const t = window.setTimeout(() => searchInputRef.current?.focus(), 0);
+		return () => window.clearTimeout(t);
+	}, [open]);
+
+	useEffect(() => {
+		if (!open) return;
+		const onPointer = (e: PointerEvent) => {
+			const el = rootRef.current;
+			if (el && !el.contains(e.target as Node)) setOpen(false);
+		};
+		document.addEventListener("pointerdown", onPointer, true);
+		return () => document.removeEventListener("pointerdown", onPointer, true);
+	}, [open]);
+
+	useEffect(() => {
+		if (!open) return;
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				setOpen(false);
+			}
+		};
+		document.addEventListener("keydown", onKey);
+		return () => document.removeEventListener("keydown", onKey);
+	}, [open]);
+
+	const labelShrunk = fieldActive || hasVal;
+	const labelTop = labelShrunk ? 8 : 10;
+	const labelFontSize = labelShrunk ? 10 : 14;
+
+	return (
+		<div
+			ref={rootRef}
+			style={{ display: "block", position: "relative", flex: 1, minWidth: 120 }}
+		>
+			<div
+				style={{
+					position: "absolute",
+					top: labelTop,
+					left: 14,
+					fontSize: labelFontSize,
+					fontFamily: labelShrunk ? "var(--mono)" : "var(--sans)",
+					color: fieldActive ? "#a8e88a" : "rgba(255,255,255,.5)",
+					letterSpacing: labelShrunk ? "0.14em" : "normal",
+					textTransform: labelShrunk ? "uppercase" : "none",
+					transition: "all .25s cubic-bezier(.2,.7,.2,1)",
+					pointerEvents: "none",
+					zIndex: 1,
+				}}
+			>
+				{f.labelPhone}
+			</div>
+			<div
+				style={{
+					display: "flex",
+					alignItems: "center",
+					width: "100%",
+					boxSizing: "border-box",
+					padding: "24px 14px 10px",
+					background: "rgba(255,255,255,.03)",
+					border: `1px solid ${fieldActive ? "rgba(124,216,90,.5)" : "rgba(255,255,255,.1)"}`,
+					borderRadius: 12,
+					transition: "border-color .25s, background .25s",
+					overflow: "visible",
+					position: "relative",
+				}}
+			>
+				<button
+					type="button"
+					id={triggerId}
+					aria-haspopup="listbox"
+					aria-expanded={open}
+					aria-controls={listId}
+					aria-label={f.phoneCountryAria}
+					onClick={() => setOpen((o) => !o)}
+					onFocus={() => setFocusTrigger(true)}
+					onBlur={() => setFocusTrigger(false)}
+					style={{
+						flex: "0 0 auto",
+						display: "inline-flex",
+						alignItems: "center",
+						gap: 6,
+						padding: "4px 8px 4px 0",
+						background: "transparent",
+						border: "none",
+						fontSize: 16,
+						lineHeight: 1,
+						outline: "none",
+						cursor: "pointer",
+						color: "white",
+					}}
+				>
+					<span aria-hidden="true">{country.flag}</span>
+					<svg
+						width="12"
+						height="12"
+						viewBox="0 0 12 12"
+						fill="none"
+						aria-hidden="true"
+						style={{
+							opacity: 0.65,
+							transform: open ? "rotate(180deg)" : "none",
+							transition: "transform .2s",
+						}}
+					>
+						<path
+							d="M2.5 4.25L6 7.75l3.5-3.5"
+							stroke="currentColor"
+							strokeWidth="1.4"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						/>
+					</svg>
+				</button>
+				<div
+					aria-hidden="true"
+					style={{
+						alignSelf: "center",
+						width: 1,
+						height: 22,
+						background: "rgba(255,255,255,.12)",
+						flexShrink: 0,
+					}}
+				/>
+				<span
+					aria-hidden="true"
+					style={{
+						display: "inline-flex",
+						alignItems: "center",
+						padding: "0 8px 0 10px",
+						flex: "0 0 auto",
+						color: "rgba(255,255,255,.85)",
+						fontSize: 14,
+						lineHeight: 1.25,
+						fontFamily: "var(--mono)",
+						letterSpacing: "0.02em",
+						userSelect: "none",
+						whiteSpace: "nowrap",
+					}}
+				>
+					{country.dial}
+				</span>
+				<input
+					id={controlId}
+					type="tel"
+					inputMode="tel"
+					autoComplete="tel-national"
+					aria-label={f.phoneNumberAria}
+					value={local}
+					onChange={(e) => {
+						const raw = e.target.value;
+						const cleaned = raw.replace(/[^\d\s\-().]/g, "");
+						onLocal(cleaned);
+					}}
+					onFocus={() => setFocusInput(true)}
+					onBlur={() => setFocusInput(false)}
+					placeholder=" "
+					style={{
+						flex: 1,
+						minWidth: 0,
+						padding: "2px 0",
+						lineHeight: 1.25,
+						background: "transparent",
+						border: "none",
+						color: "white",
+						fontSize: 14,
+						fontFamily: "var(--sans)",
+						outline: "none",
+					}}
+				/>
+			</div>
+			{open ? (
+				<div
+					id={listId}
+					role="listbox"
+					aria-label={f.phoneSelectCountry}
+					style={{
+						position: "absolute",
+						left: 0,
+						right: 0,
+						top: "calc(100% + 6px)",
+						zIndex: 50,
+						maxHeight: 300,
+						overflow: "hidden",
+						display: "flex",
+						flexDirection: "column",
+						borderRadius: 12,
+						border: "1px solid rgba(255,255,255,.12)",
+						background: "var(--paper)",
+						boxShadow: "0 12px 40px rgba(0,0,0,.35)",
+					}}
+				>
+					<div
+						style={{
+							position: "relative",
+							padding: "8px 8px 6px",
+							borderBottom: "1px solid rgba(7,18,9,.12)",
+							flexShrink: 0,
+						}}
+					>
+						<label
+							htmlFor={searchId}
+							style={{
+								position: "absolute",
+								width: 1,
+								height: 1,
+								padding: 0,
+								margin: -1,
+								overflow: "hidden",
+								clip: "rect(0, 0, 0, 0)",
+								whiteSpace: "nowrap",
+								border: 0,
+							}}
+						>
+							{f.phoneSearchLabel}
+						</label>
+						<input
+							ref={searchInputRef}
+							id={searchId}
+							type="search"
+							autoComplete="off"
+							placeholder={f.phoneSearchPlaceholder}
+							value={countryQuery}
+							onChange={(e) => setCountryQuery(e.target.value)}
+							onFocus={() => setFocusSearch(true)}
+							onBlur={() => setFocusSearch(false)}
+							onKeyDown={(e) => {
+								if (e.key !== "Enter" || filteredCountries.length === 0) return;
+								e.preventDefault();
+								const first = filteredCountries[0];
+								if (first) {
+									onCountryIdx(first.idx);
+									setOpen(false);
+								}
+							}}
+							style={{
+								width: "100%",
+								boxSizing: "border-box",
+								padding: "10px 12px",
+								borderRadius: 8,
+								border: "1px solid rgba(7,18,9,.15)",
+								background: "rgba(255,255,255,.9)",
+								color: "var(--ink)",
+								fontSize: 14,
+								fontFamily: "var(--sans)",
+								outline: "none",
+							}}
+						/>
+					</div>
+					<div
+						style={{
+							overflowY: "auto",
+							padding: 6,
+							flex: 1,
+							minHeight: 0,
+						}}
+					>
+						{filteredCountries.length === 0 ? (
+							<div
+								style={{
+									padding: "14px 12px",
+									color: "var(--ink)",
+									opacity: 0.65,
+									fontSize: 14,
+								}}
+							>
+								{f.phoneNoMatches}
+							</div>
+						) : (
+							filteredCountries.map(({ c, idx: i }) => (
+								<button
+									key={`${c.dial}-${c.label}`}
+									type="button"
+									role="option"
+									aria-selected={i === countryIdx}
+									onMouseDown={(e) => e.preventDefault()}
+									onClick={() => {
+										onCountryIdx(i);
+										setOpen(false);
+									}}
+									style={{
+										display: "flex",
+										width: "100%",
+										alignItems: "center",
+										gap: 10,
+										padding: "10px 12px",
+										border: "none",
+										borderRadius: 8,
+										background:
+											i === countryIdx
+												? "rgba(124,216,90,.18)"
+												: "transparent",
+										color: "var(--ink)",
+										fontSize: 14,
+										fontFamily: "var(--sans)",
+										textAlign: "left",
+										cursor: "pointer",
+										outline: "none",
+									}}
+								>
+									<span aria-hidden="true" style={{ fontSize: 16, lineHeight: 1 }}>
+										{c.flag}
+									</span>
+									<span
+										className="mono"
+										style={{
+											color: "var(--ink)",
+											opacity: 0.85,
+											minWidth: 44,
+										}}
+									>
+										{c.dial}
+									</span>
+									<span style={{ flex: 1 }}>{c.label}</span>
+								</button>
+							))
+						)}
+					</div>
+				</div>
+			) : null}
+		</div>
+	);
+}
+
 export function Footer() {
+	const { messages } = useLanguage();
+	const f = messages.footer;
+	const [phoneCountryIdx, setPhoneCountryIdx] = useState(0);
 	const [form, setForm] = useState({
 		name: "",
 		email: "",
@@ -147,14 +552,14 @@ export function Footer() {
 							marginBottom: 20,
 						}}
 					>
-						Let's build it together
+						{f.eyebrow}
 					</div>
 					<h2 style={{ maxWidth: 900, margin: "0 auto 24px" }}>
-						Wondering how your{" "}
+						{f.titleBefore}{" "}
 						<span className="serif-italic" style={{ color: "#c084ff" }}>
-							mobile app
+							{f.titleHighlight}
 						</span>{" "}
-						could look?
+						{f.titleAfter}
 					</h2>
 					<p
 						style={{
@@ -165,22 +570,21 @@ export function Footer() {
 							lineHeight: 1.55,
 						}}
 					>
-						Book a no-commitment consultation or schedule an in-person visit to
-						your business (Ohio only) and discover your project's potential.
+						{f.body}
 					</p>
 					<div
 						className="row center gap-16"
 						style={{ justifyContent: "center", flexWrap: "wrap" }}
 					>
 						<a href="#contact-form" className="btn btn-primary">
-							Book a free visit{" "}
+							{f.bookFree}{" "}
 							<Icons.arrow className="chev" style={{ width: 14, height: 14 }} />
 						</a>
 						<a
 							href="mailto:snappiffy.business@gmail.com"
 							className="btn btn-ghost"
 						>
-							Email us
+							{f.emailUs}
 						</a>
 					</div>
 				</div>
@@ -213,8 +617,7 @@ export function Footer() {
 								maxWidth: 340,
 							}}
 						>
-							Custom mobile apps, AI-integrated, shipped in weeks. Based in
-							Dublin, Ohio — serving teams worldwide.
+							{f.tagline}
 						</p>
 						<div className="col gap-12" style={{ marginTop: 32 }}>
 							<div
@@ -254,10 +657,10 @@ export function Footer() {
 									marginBottom: 4,
 								}}
 							>
-								RESPONSE TIME
+								{f.responseLabel}
 							</div>
 							<div style={{ fontSize: 18, color: "white", fontWeight: 500 }}>
-								Usually within 24h
+								{f.responseValue}
 							</div>
 						</div>
 					</div>
@@ -265,7 +668,7 @@ export function Footer() {
 					<div>
 						<div className="row between center" style={{ marginBottom: 20 }}>
 							<h3 style={{ color: "white", fontSize: 22, fontWeight: 500 }}>
-								Tell us about your project
+								{f.formTitle}
 							</h3>
 							<div
 								className="mono"
@@ -275,7 +678,7 @@ export function Footer() {
 									letterSpacing: "0.14em",
 								}}
 							>
-								05 FIELDS
+								{f.fieldsCount}
 							</div>
 						</div>
 						{sent ? (
@@ -290,10 +693,10 @@ export function Footer() {
 							>
 								<div style={{ fontSize: 48, marginBottom: 12 }}>✨</div>
 								<div style={{ fontSize: 20, color: "white", marginBottom: 6 }}>
-									Thank you!
+									{f.thankYou}
 								</div>
 								<div style={{ color: "rgba(255,255,255,.7)" }}>
-									We'll reach out within 24 hours.
+									{f.thankYouSub}
 								</div>
 							</div>
 						) : (
@@ -307,32 +710,33 @@ export function Footer() {
 								<div className="row gap-12">
 									<Input
 										v={form.name}
-										onV={(v) => setForm((f) => ({ ...f, name: v }))}
-										label="Name"
+										onV={(v) => setForm((fm) => ({ ...fm, name: v }))}
+										label={f.labelName}
 									/>
 									<Input
 										v={form.email}
-										onV={(v) => setForm((f) => ({ ...f, email: v }))}
-										label="Email"
+										onV={(v) => setForm((fm) => ({ ...fm, email: v }))}
+										label={f.labelEmail}
 										type="email"
 									/>
 								</div>
 								<div className="row gap-12">
-									<Input
-										v={form.phone}
-										onV={(v) => setForm((f) => ({ ...f, phone: v }))}
-										label="Phone"
+									<PhoneField
+										countryIdx={phoneCountryIdx}
+										onCountryIdx={setPhoneCountryIdx}
+										local={form.phone}
+										onLocal={(v) => setForm((fm) => ({ ...fm, phone: v }))}
 									/>
 									<Input
 										v={form.company}
-										onV={(v) => setForm((f) => ({ ...f, company: v }))}
-										label="Company (optional)"
+										onV={(v) => setForm((fm) => ({ ...fm, company: v }))}
+										label={f.labelCompany}
 									/>
 								</div>
 								<Input
 									v={form.msg}
-									onV={(v) => setForm((f) => ({ ...f, msg: v }))}
-									label="Tell us about your project"
+									onV={(v) => setForm((fm) => ({ ...fm, msg: v }))}
+									label={f.labelMessage}
 									textarea
 								/>
 								<button
@@ -340,7 +744,7 @@ export function Footer() {
 									className="btn btn-primary"
 									style={{ marginTop: 6, alignSelf: "flex-start" }}
 								>
-									Send message{" "}
+									{f.sendMessage}{" "}
 									<Icons.arrow
 										className="chev"
 										style={{ width: 14, height: 14 }}
@@ -369,20 +773,20 @@ export function Footer() {
 							letterSpacing: "0.1em",
 						}}
 					>
-						© 2023 — 2026 Snappiffy Agency. All rights reserved.
+						{f.copyright}
 					</div>
 					<div className="row gap-24">
 						{(
 							[
-								{ label: "Privacy", href: "/privacy" },
-								{ label: "Terms", href: "/terms" },
+								{ label: f.privacy, href: "/privacy" },
+								{ label: f.terms, href: "/terms" },
 								{
-									label: "Instagram",
+									label: f.instagram,
 									href: "https://www.instagram.com/",
 									external: true,
 								},
 								{
-									label: "LinkedIn",
+									label: f.linkedin,
 									href: "https://www.linkedin.com/",
 									external: true,
 								},

@@ -2,6 +2,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
 import { useScrollDirection } from "../hooks/use-scroll-direction";
+import { useLanguage } from "../i18n/LanguageContext";
 import manuelFerrerPhoto from "../assets/manuelferrer.webp";
 import claude from "../assets/platform_logos/claude.svg";
 import css3 from "../assets/platform_logos/css-3.svg";
@@ -82,7 +83,7 @@ const logos: LogoItem[] = [
 	{ id: "claude", label: "Claude", x: 0.78, y: 0.88, variant: "single", src: claude },
 ];
 
-function ConstellationBand({ v }: { v: number }) {
+function ConstellationBand({ v, svgTitle }: { v: number; svgTitle: string }) {
 	const isMobile = useSyncExternalStore(
 		subscribeMobile,
 		getMobileSnapshot,
@@ -124,7 +125,7 @@ function ConstellationBand({ v }: { v: number }) {
 				height={svgH}
 				style={{ position: "absolute", inset: 0, opacity: 0.45 }}
 			>
-				<title>Tech Stack Constellation</title>
+				<title>{svgTitle}</title>
 				<defs>
 					<linearGradient id="constLine" x1="0" x2="1">
 						<stop offset="0" stopColor="#1e7a24" />
@@ -225,7 +226,7 @@ function ConstellationBand({ v }: { v: number }) {
 	);
 }
 
-function VideoCard() {
+function VideoCard({ videoTitle }: { videoTitle: string }) {
 	const [playing, setPlaying] = useState(false);
 	return (
 		<div
@@ -242,7 +243,7 @@ function VideoCard() {
 			{playing ? (
 				<iframe
 					src="https://www.youtube.com/embed/iTCx-iAFJ9A?autoplay=1&rel=0"
-					title="Introduction to Snappiffy"
+					title={videoTitle}
 					frameBorder="0"
 					allow="autoplay; encrypted-media; picture-in-picture"
 					allowFullScreen
@@ -258,7 +259,7 @@ function VideoCard() {
 				<>
 					<img
 						src="https://img.youtube.com/vi/iTCx-iAFJ9A/maxresdefault.jpg"
-						alt="Introduction to Snappiffy"
+						alt={videoTitle}
 						style={{
 							position: "absolute",
 							inset: 0,
@@ -323,6 +324,7 @@ function VideoCard() {
 }
 
 export function About() {
+	const { messages } = useLanguage();
 	const ref = useReveal();
 	const v = useScrollDirection();
 
@@ -332,7 +334,10 @@ export function About() {
 			className="section light"
 			style={{ paddingTop: 120, paddingBottom: 140, overflow: "hidden" }}
 		>
-			<ConstellationBand v={v} />
+			<ConstellationBand
+				v={v}
+				svgTitle={messages.about.constellationTitle}
+			/>
 			<div ref={ref} className="container reveal" style={{ paddingTop: 80 }}>
 				<div
 					className="row between"
@@ -340,14 +345,14 @@ export function About() {
 				>
 					<div style={{ flex: "1 1 440px", maxWidth: 540 }}>
 						<div className="eyebrow" style={{ marginBottom: 24 }}>
-							About Snappiffy
+							{messages.about.eyebrow}
 						</div>
 						<h2 style={{ marginBottom: 28, color: "var(--ink)" }}>
-							We empower business with{" "}
+							{messages.about.titleBefore}{" "}
 							<span className="serif-italic" style={{ color: "#9b5cff" }}>
-								custom mobile apps
+								{messages.about.titleHighlight}
 							</span>
-							, powered by AI.
+							{messages.about.titleAfter}
 						</h2>
 						<p
 							style={{
@@ -357,9 +362,7 @@ export function About() {
 								marginBottom: 32,
 							}}
 						>
-							Significantly improve your business processes and save a ton of
-							money at the same time. We combine custom mobile development with
-							the real power of AI — no hype, just leverage.
+							{messages.about.body}
 						</p>
 						<div className="row center gap-12" style={{ marginBottom: 40 }}>
 							<div
@@ -409,14 +412,14 @@ export function About() {
 											marginLeft: 6,
 										}}
 									>
-										CEO
+										{messages.about.ceo}
 									</span>
 								</div>
 								<div
 									style={{ fontSize: 13, color: "rgba(7,18,9,0.6)" }}
 									className="serif-italic"
 								>
-									Combining custom apps with AI power pays off.
+									{messages.about.ceoQuote}
 								</div>
 							</div>
 						</div>
@@ -425,9 +428,13 @@ export function About() {
 							style={{ gap: 0, borderTop: "1px solid rgba(14,63,21,.12)" }}
 						>
 							{[
-								{ k: "10x", l: "more efficiency in processes" },
-								{ k: "$170K", s: "/yr", l: "average savings" },
-								{ k: "80%+", l: "process optimization" },
+								{ k: "10x", l: messages.about.stat1 },
+								{
+									k: "$170K",
+									s: messages.about.stat2Suffix,
+									l: messages.about.stat2,
+								},
+								{ k: "80%+", l: messages.about.stat3 },
 							].map((s) => (
 								<div
 									key={s.k}
@@ -474,7 +481,7 @@ export function About() {
 					<div
 						style={{ flex: "1 1 480px", maxWidth: 620, position: "relative" }}
 					>
-						<VideoCard />
+						<VideoCard videoTitle={messages.about.videoTitle} />
 					</div>
 				</div>
 			</div>

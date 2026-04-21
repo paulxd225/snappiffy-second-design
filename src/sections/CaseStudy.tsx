@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import ochurros1 from "../assets/apps-examples/ochurros1.webp";
 import ochurros2 from "../assets/apps-examples/ochurros2.webp";
 import ochurros3 from "../assets/apps-examples/ochurros3.webp";
 import ochurros4 from "../assets/apps-examples/ochurros4.webp";
 import ochurros5 from "../assets/apps-examples/ochurros5.webp";
+import { useLanguage } from "../i18n/LanguageContext";
 
 const navBtnStyle: React.CSSProperties = {
 	width: 44,
@@ -17,56 +18,52 @@ const navBtnStyle: React.CSSProperties = {
 	transition: "all .3s",
 };
 
-const apps = [
+const CASE_APP_LAYOUT = [
 	{
-		name: "Oh Churros",
-		client: "Venezuelan Restaurant · Columbus OH",
-		who: "Michell Roa, Founder / Owner",
-		desc: "Handle inventory, show and rate products, send offer coupons, process payments and sell for pick-up — all in one app, deployed on the Apple App Store.",
 		color: "#ff3df0",
 		accent: "#c084ff",
 		screens: [
-			{ label: "Menu", theme: "light", palette: "#ff3df0", image: ochurros1 },
-			{ label: "Login", theme: "light", palette: "#ff7ae3", image: ochurros2 },
-			{ label: "Brand", theme: "pink", palette: "#ff3df0", image: ochurros3 },
-			{ label: "Discovery", theme: "dark", palette: "#c084ff", image: ochurros4 },
-			{ label: "Cart", theme: "light", palette: "#ff3df0", image: ochurros5 },
+			{ theme: "light", palette: "#ff3df0", image: ochurros1 },
+			{ theme: "light", palette: "#ff7ae3", image: ochurros2 },
+			{ theme: "pink", palette: "#ff3df0", image: ochurros3 },
+			{ theme: "dark", palette: "#c084ff", image: ochurros4 },
+			{ theme: "light", palette: "#ff3df0", image: ochurros5 },
 		],
 	},
 	{
-		name: "Gym Spot",
-		client: "Fitness chain · Ohio",
-		who: "Andrea Lopez, COO",
-		desc: "Workouts, programs and check-in. AI coach suggests routines based on progress — with staff tools for schedules, capacity, and member messaging.",
 		color: "#c084ff",
 		accent: "#9b5cff",
 		screens: [
-			{ label: "Home", theme: "dark", palette: "#9b5cff" },
-			{ label: "Classes", theme: "light", palette: "#c084ff" },
-			{ label: "Check-in", theme: "dark", palette: "#9b5cff" },
-			{ label: "Programs", theme: "light", palette: "#c084ff" },
-			{ label: "Profile", theme: "dark", palette: "#9b5cff" },
+			{ theme: "dark", palette: "#9b5cff" },
+			{ theme: "light", palette: "#c084ff" },
+			{ theme: "dark", palette: "#9b5cff" },
+			{ theme: "light", palette: "#c084ff" },
+			{ theme: "dark", palette: "#9b5cff" },
 		],
 	},
 	{
-		name: "Greenary",
-		client: "Horticulture for landmark venues · US",
-		who: "Operations lead, airports & hospitality",
-		desc: "Install and maintain ornamental plant programs across high-traffic places—airports, hotels, and campuses—with crew routing, species libraries, and plant-health monitoring in one platform.",
 		color: "#7cd85a",
 		accent: "#2ea02c",
 		screens: [
-			{ label: "Venues", theme: "dark", palette: "#7cd85a" },
-			{ label: "Install", theme: "dark", palette: "#2ea02c" },
-			{ label: "Species", theme: "light", palette: "#7cd85a" },
-			{ label: "Health", theme: "dark", palette: "#2ea02c" },
-			{ label: "Routes", theme: "dark", palette: "#4cc23a" },
+			{ theme: "dark", palette: "#7cd85a" },
+			{ theme: "dark", palette: "#2ea02c" },
+			{ theme: "light", palette: "#7cd85a" },
+			{ theme: "dark", palette: "#2ea02c" },
+			{ theme: "dark", palette: "#4cc23a" },
 		],
 	},
-];
+] as const;
 
 type Screen = { label: string; theme: string; palette: string; image?: string };
-type App = (typeof apps)[0];
+type App = {
+	name: string;
+	client: string;
+	who: string;
+	desc: string;
+	color: string;
+	accent: string;
+	screens: Screen[];
+};
 
 function PhoneFrame({ screen, app }: { screen: Screen; app: App }) {
 	const { theme, palette, label, image } = screen;
@@ -330,7 +327,7 @@ function PhonesStrip({ app }: { app: App }) {
 		>
 			{app.screens.map((s, k) => (
 				<div
-					key={s.label}
+					key={`${k}-${s.label}`}
 					style={{
 						flex: "0 0 auto",
 						scrollSnapAlign: "center",
@@ -346,6 +343,26 @@ function PhonesStrip({ app }: { app: App }) {
 }
 
 export function CaseStudy() {
+	const { messages } = useLanguage();
+	const apps = useMemo(
+		() =>
+			CASE_APP_LAYOUT.map((layout, i) => {
+				const copy = messages.caseStudy.apps[i];
+				return {
+					color: layout.color,
+					accent: layout.accent,
+					name: copy.name,
+					client: copy.client,
+					who: copy.who,
+					desc: copy.desc,
+					screens: layout.screens.map((scr, j) => ({
+						...scr,
+						label: copy.screens[j] ?? "",
+					})),
+				} satisfies App;
+			}),
+		[messages],
+	);
 	const [idx, setIdx] = useState(0);
 	const [auto, setAuto] = useState(true);
 	const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -405,12 +422,12 @@ export function CaseStudy() {
 				>
 					<div>
 						<div className="eyebrow" style={{ marginBottom: 20 }}>
-							Case study
+							{messages.caseStudy.eyebrow}
 						</div>
 						<h2>
-							Real apps.{" "}
+							{messages.caseStudy.titleBefore}{" "}
 							<span className="serif-italic" style={{ color: "#c084ff" }}>
-								Real customers.
+								{messages.caseStudy.titleHighlight}
 							</span>
 						</h2>
 					</div>
@@ -421,7 +438,7 @@ export function CaseStudy() {
 							className="btn btn-ghost"
 							style={{ padding: "10px 16px", fontSize: 13 }}
 						>
-							{auto ? "⏸ Autoplay" : "▶ Autoplay"}
+							{auto ? messages.caseStudy.autoplayOn : messages.caseStudy.autoplayOff}
 						</button>
 						<div className="row gap-8">
 							<button type="button" onClick={() => go(-1)} style={navBtnStyle}>

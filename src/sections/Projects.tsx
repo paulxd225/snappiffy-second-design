@@ -1,5 +1,7 @@
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
+import { useLanguage } from "../i18n/LanguageContext";
+import type { Messages } from "../i18n/en.messages";
 
 import apiBg from "../assets/projects_types/API.jpg";
 import assistantsBg from "../assets/projects_types/AIassistants.jpg";
@@ -20,72 +22,75 @@ import travelBg from "../assets/projects_types/travel.png";
 
 type IconKey = keyof typeof Icons;
 
+type TileId = keyof Messages["projects"]["tiles"];
+
 type Tile = {
-	id: string;
-	t: string;
+	id: TileId;
 	c: string;
 	ic: IconKey;
 	bg?: string;
 };
 
 const row1: Tile[] = [
-	{ id: "food", t: "Food Ordering", c: "#ff3df0", ic: "utensil", bg: foodorderingBg },
+	{ id: "food", c: "#ff3df0", ic: "utensil", bg: foodorderingBg },
 	{
 		id: "fitness",
-		t: "Fitness Coach",
 		c: "#7cd85a",
 		ic: "users",
 		bg: fitnesscoachBg,
 	},
-	{ id: "health", t: "Healthcare", c: "#54c5f8", ic: "plus", bg: healthcareBg },
-	{ id: "barber", t: "Barbershop", c: "#c084ff", ic: "spark", bg: barbershopBg },
+	{ id: "health", c: "#54c5f8", ic: "plus", bg: healthcareBg },
+	{ id: "barber", c: "#c084ff", ic: "spark", bg: barbershopBg },
 	{
 		id: "marketplace",
-		t: "Marketplace",
 		c: "#ffa000",
 		ic: "cart",
 		bg: marketplaceBg,
 	},
 	{
 		id: "elearning",
-		t: "E-Learning",
 		c: "#2ea02c",
 		ic: "chip",
 		bg: elearningBg,
 	},
 	{
 		id: "travel",
-		t: "Travel & Bookings",
 		c: "#ff7ae3",
 		ic: "pin",
 		bg: travelBg,
 	},
-	{ id: "events", t: "Events", c: "#9b5cff", ic: "spark", bg: eventsBg },
+	{ id: "events", c: "#9b5cff", ic: "spark", bg: eventsBg },
 ];
 const row2: Tile[] = [
-	{ id: "navigation", t: "Navigation", c: "#68a063", ic: "pin", bg: navigationBg },
-	{ id: "logistics", t: "Logistics", c: "#e0234e", ic: "trend", bg: logisticsBg },
-	{ id: "legalops", t: "Legal Ops", c: "#3178c6", ic: "chip", bg: legalopsBg },
-	{ id: "api", t: "API's", c: "#c084ff", ic: "spark", bg: apiBg },
-	{ id: "payrolls", t: "HR / Payroll", c: "#4cc23a", ic: "users", bg: payrollsBg },
-	{ id: "pos", t: "POS Systems", c: "#ff3df0", ic: "cart", bg: posBg },
+	{ id: "navigation", c: "#68a063", ic: "pin", bg: navigationBg },
+	{ id: "logistics", c: "#e0234e", ic: "trend", bg: logisticsBg },
+	{ id: "legalops", c: "#3178c6", ic: "chip", bg: legalopsBg },
+	{ id: "api", c: "#c084ff", ic: "spark", bg: apiBg },
+	{ id: "payrolls", c: "#4cc23a", ic: "users", bg: payrollsBg },
+	{ id: "pos", c: "#ff3df0", ic: "cart", bg: posBg },
 	{
 		id: "assistants",
-		t: "AI Assistants",
 		c: "#9b5cff",
 		ic: "brain",
 		bg: assistantsBg,
 	},
 	{
 		id: "dashboards",
-		t: "Dashboards",
 		c: "#10a37f",
 		ic: "trend",
 		bg: dashboardBg,
 	},
 ];
 
-function ProjectTile({ it }: { it: Tile }) {
+function ProjectTile({
+	it,
+	title,
+	appType,
+}: {
+	it: Tile;
+	title: string;
+	appType: string;
+}) {
 	const IconEl = Icons[it.ic];
 	return (
 		<div
@@ -207,7 +212,7 @@ function ProjectTile({ it }: { it: Tile }) {
 						className="mono"
 						style={{ fontSize: 10, color: it.c, letterSpacing: "0.12em" }}
 					>
-						APP TYPE
+						{appType}
 					</div>
 					<div
 						style={{
@@ -233,7 +238,7 @@ function ProjectTile({ it }: { it: Tile }) {
 						>
 							<IconEl style={{ width: 14, height: 14, opacity: 0.95 }} />
 						</span>
-						<span>{it.t}</span>
+						<span>{title}</span>
 					</div>
 				</div>
 				<span
@@ -258,10 +263,14 @@ function MarqueeRow({
 	items,
 	dir,
 	dur,
+	tiles,
+	appType,
 }: {
 	items: Tile[];
 	dir: "l" | "r";
 	dur: number;
+	tiles: Messages["projects"]["tiles"];
+	appType: string;
 }) {
 	return (
 		<div
@@ -280,7 +289,14 @@ function MarqueeRow({
 				}}
 			>
 				{[0, 1].flatMap((copy) =>
-					items.map((it) => <ProjectTile key={`${it.id}:${copy}`} it={it} />),
+					items.map((it) => (
+						<ProjectTile
+							key={`${it.id}:${copy}`}
+							it={it}
+							title={tiles[it.id]}
+							appType={appType}
+						/>
+					)),
 				)}
 			</div>
 		</div>
@@ -288,6 +304,8 @@ function MarqueeRow({
 }
 
 export function Projects() {
+	const { messages } = useLanguage();
+	const tiles = messages.projects.tiles;
 	const ref = useReveal();
 	return (
 		<section
@@ -307,12 +325,12 @@ export function Projects() {
 				>
 					<div>
 						<div className="eyebrow" style={{ marginBottom: 20 }}>
-							Project catalogue
+							{messages.projects.eyebrow}
 						</div>
 						<h2>
-							What kind of projects{" "}
+							{messages.projects.titleBefore}{" "}
 							<span className="serif-italic" style={{ color: "#c084ff" }}>
-								are we capable of?
+								{messages.projects.titleHighlight}
 							</span>
 						</h2>
 					</div>
@@ -324,14 +342,25 @@ export function Projects() {
 							lineHeight: 1.6,
 						}}
 					>
-						Over 40 apps shipped across industries. Here's a sample of what
-						we've built.
+						{messages.projects.blurb}
 					</p>
 				</div>
 			</div>
-			<MarqueeRow items={row1} dir="l" dur={60} />
+			<MarqueeRow
+				items={row1}
+				dir="l"
+				dur={60}
+				tiles={tiles}
+				appType={messages.projects.appType}
+			/>
 			<div style={{ height: 24 }} />
-			<MarqueeRow items={row2} dir="r" dur={72} />
+			<MarqueeRow
+				items={row2}
+				dir="r"
+				dur={72}
+				tiles={tiles}
+				appType={messages.projects.appType}
+			/>
 		</section>
 	);
 }
