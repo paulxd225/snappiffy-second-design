@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
 import { useScrollDirection } from "../hooks/use-scroll-direction";
@@ -14,6 +14,22 @@ import nestjs from "../assets/platform_logos/nestjs.svg";
 import nodejs from "../assets/platform_logos/nodejs.svg";
 import react from "../assets/platform_logos/react.svg";
 import typescript from "../assets/platform_logos/typescript.svg";
+
+const MOBILE_MQ = "(max-width: 900px)";
+
+function subscribeMobile(cb: () => void) {
+	const mq = window.matchMedia(MOBILE_MQ);
+	mq.addEventListener("change", cb);
+	return () => mq.removeEventListener("change", cb);
+}
+
+function getMobileSnapshot() {
+	return window.matchMedia(MOBILE_MQ).matches;
+}
+
+function getMobileServerSnapshot() {
+	return false;
+}
 
 type LogoItem =
 	| {
@@ -67,6 +83,24 @@ const logos: LogoItem[] = [
 ];
 
 function ConstellationBand({ v }: { v: number }) {
+	const isMobile = useSyncExternalStore(
+		subscribeMobile,
+		getMobileSnapshot,
+		getMobileServerSnapshot,
+	);
+	const bandH = isMobile ? 120 : 200;
+	const svgH = isMobile ? 96 : 160;
+	const padX = isMobile ? 7.2 : 12;
+	const padY = isMobile ? 6 : 10;
+	const padBottom = isMobile ? 7.2 : 12;
+	const minW = isMobile ? 43.2 : 72;
+	const tripleGap = isMobile ? 2.4 : 4;
+	const tripleMinH = isMobile ? 19.2 : 32;
+	const tripleIcon = isMobile ? 13.2 : 22;
+	const singleH = isMobile ? 36 : 60;
+	const singleW = isMobile ? 48 : 80;
+	const labelSize = isMobile ? 9 : 15;
+
 	const [offset, setOffset] = useState(0);
 	useEffect(() => {
 		const id = requestAnimationFrame(() => {
@@ -78,7 +112,7 @@ function ConstellationBand({ v }: { v: number }) {
 		<div
 			style={{
 				position: "relative",
-				height: 200,
+				height: bandH,
 				width: "100%",
 				overflow: "hidden",
 				borderBottom: "1px solid rgba(14,63,21,.08)",
@@ -87,7 +121,7 @@ function ConstellationBand({ v }: { v: number }) {
 		>
 			<svg
 				width="100%"
-				height="160"
+				height={svgH}
 				style={{ position: "absolute", inset: 0, opacity: 0.45 }}
 			>
 				<title>Tech Stack Constellation</title>
@@ -103,9 +137,9 @@ function ConstellationBand({ v }: { v: number }) {
 							<line
 								key={`${it.id}-line`}
 								x1={`${(it.x * 120 + offset * 0.05) % 100}%`}
-								y1={it.y * 160}
+								y1={it.y * svgH}
 								x2={`${(logos[i + 1].x * 120 + offset * 0.05) % 100}%`}
-								y2={logos[i + 1].y * 160}
+								y2={logos[i + 1].y * svgH}
 								stroke="url(#constLine)"
 								strokeWidth="1"
 								strokeOpacity="0.65"
@@ -119,7 +153,7 @@ function ConstellationBand({ v }: { v: number }) {
 					style={{
 						position: "absolute",
 						left: `${(((it.x * 120 + offset * 0.05) % 100) + 100) % 100}%`,
-						top: it.y * 160,
+						top: it.y * svgH,
 						transition: "transform .6s cubic-bezier(.2,.7,.2,1)",
 						transform: `translate(-50%, -50%) translateX(${v * 0.4}px)`,
 					}}
@@ -127,8 +161,8 @@ function ConstellationBand({ v }: { v: number }) {
 					<div
 						className="col center"
 						style={{
-							padding: "10px 12px 12px",
-							minWidth: 72,
+							padding: `${padY}px ${padX}px ${padBottom}px`,
+							minWidth: minW,
 							background: "none",
 							borderRadius: 16,
 							boxShadow:
@@ -140,7 +174,11 @@ function ConstellationBand({ v }: { v: number }) {
 						{it.variant === "triple" ? (
 							<div
 								className="row center"
-								style={{ gap: 4, minHeight: 32, alignItems: "center" }}
+								style={{
+									gap: tripleGap,
+									minHeight: tripleMinH,
+									alignItems: "center",
+								}}
 							>
 								{it.srcs.map((src) => (
 									<img
@@ -148,7 +186,11 @@ function ConstellationBand({ v }: { v: number }) {
 										src={src}
 										alt=""
 										draggable={false}
-										style={{ height: 22, width: 22, objectFit: "contain" }}
+										style={{
+											height: tripleIcon,
+											width: tripleIcon,
+											objectFit: "contain",
+										}}
 									/>
 								))}
 							</div>
@@ -158,15 +200,15 @@ function ConstellationBand({ v }: { v: number }) {
 								alt=""
 								draggable={false}
 								style={{
-									height: 60,
-									width: 80,
+									height: singleH,
+									width: singleW,
 									objectFit: "contain",
 								}}
 							/>
 						)}
 						<span
 							style={{
-								fontSize: 15,
+								fontSize: labelSize,
 								fontWeight: 600,
 								letterSpacing: "0.02em",
 								color: "var(--ink)",

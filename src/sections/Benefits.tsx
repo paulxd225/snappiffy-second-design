@@ -127,11 +127,12 @@ export function Benefits() {
 			style={{
 				background: "linear-gradient(180deg, #0e3f15, #15581c)",
 				paddingTop: 160,
+				overflowX: "hidden",
 			}}
 		>
 			<div className="grid-bg" style={{ opacity: 0.35 }} />
 			<div
-				className="orb"
+				className="orb benefits-orb"
 				style={{
 					width: 420,
 					height: 420,

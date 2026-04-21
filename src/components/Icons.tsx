@@ -200,4 +200,28 @@ export const Icons = {
 			<circle cx="12" cy="9" r="2.5" />
 		</svg>
 	),
+	menu: (p: IconProps) => (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="1.6"
+			aria-hidden="true"
+			{...p}
+		>
+			<path d="M5 7h14M5 12h14M5 17h14" strokeLinecap="round" />
+		</svg>
+	),
+	close: (p: IconProps) => (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="1.6"
+			aria-hidden="true"
+			{...p}
+		>
+			<path d="M7 7l10 10M17 7L7 17" strokeLinecap="round" />
+		</svg>
+	),
 };
