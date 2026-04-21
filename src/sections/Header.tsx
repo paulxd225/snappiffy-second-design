@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import {
+	type CSSProperties,
+	useEffect,
+	useRef,
+	useState,
+	useSyncExternalStore,
+} from "react";
+import { createPortal } from "react-dom";
 import { Icons } from "../components/Icons";
 import { Logo } from "../components/Logo";
 import { LANGUAGE_OPTIONS, optionForLocale } from "../i18n/languages";
@@ -21,12 +28,22 @@ function getMobileServerSnapshot() {
 	return false;
 }
 
+const LANGUAGE_MENU_PANEL_STYLE: CSSProperties = {
+	borderRadius: 12,
+	border: "1px solid rgba(255,255,255,.12)",
+	background: "var(--paper)",
+	boxShadow: "0 16px 48px rgba(0,0,0,.35)",
+	padding: 6,
+};
+
 function LanguagePicker({
 	onPick,
 	align = "end",
+	variant = "popover",
 }: {
 	onPick?: () => void;
 	align?: "start" | "end";
+	variant?: "popover" | "sheet";
 }) {
 	const { locale, setLocale, messages } = useLanguage();
 	const [open, setOpen] = useState(false);
@@ -34,14 +51,14 @@ function LanguagePicker({
 	const cur = optionForLocale(locale);
 
 	useEffect(() => {
-		if (!open) return;
+		if (!open || variant !== "popover") return;
 		const onPointer = (e: PointerEvent) => {
 			const el = rootRef.current;
 			if (el && !el.contains(e.target as Node)) setOpen(false);
 		};
 		document.addEventListener("pointerdown", onPointer, true);
 		return () => document.removeEventListener("pointerdown", onPointer, true);
-	}, [open]);
+	}, [open, variant]);
 
 	useEffect(() => {
 		if (!open) return;
@@ -52,86 +69,123 @@ function LanguagePicker({
 		return () => document.removeEventListener("keydown", onKey);
 	}, [open]);
 
+	const optionButtons = LANGUAGE_OPTIONS.map((opt) => (
+		<button
+			key={opt.locale}
+			type="button"
+			role="option"
+			aria-selected={opt.locale === locale}
+			onMouseDown={(e) => e.preventDefault()}
+			onClick={() => {
+				setLocale(opt.locale as Locale);
+				setOpen(false);
+				onPick?.();
+			}}
+			style={{
+				display: "flex",
+				width: "100%",
+				alignItems: "center",
+				gap: 10,
+				padding: "10px 12px",
+				border: "none",
+				borderRadius: 8,
+				background:
+					opt.locale === locale ? "rgba(124,216,90,.2)" : "transparent",
+				color: "var(--ink)",
+				fontSize: 14,
+				textAlign: "left",
+				cursor: "pointer",
+			}}
+		>
+			<span style={{ fontSize: 16 }}>{opt.flag}</span>
+			<span className="mono" style={{ opacity: 0.75, minWidth: 40 }}>
+				{opt.code}
+			</span>
+			<span style={{ flex: 1, minWidth: 0 }}>{opt.label}</span>
+		</button>
+	));
+
+	const listbox = (
+		<div
+			role="listbox"
+			aria-label={messages.header.languageMenu}
+			style={
+				variant === "sheet"
+					? {
+							...LANGUAGE_MENU_PANEL_STYLE,
+							width: "min(360px, calc(100vw - 40px))",
+							maxWidth: "100%",
+							maxHeight: "min(480px, 72vh)",
+							overflowY: "auto",
+							WebkitOverflowScrolling: "touch",
+						}
+					: {
+							...LANGUAGE_MENU_PANEL_STYLE,
+							position: "absolute",
+							top: "calc(100% + 8px)",
+							...(align === "end" ? { right: 0 } : { left: 0 }),
+							minWidth: 220,
+							zIndex: 80,
+						}
+			}
+			onPointerDown={(e) => variant === "sheet" && e.stopPropagation()}
+		>
+			{optionButtons}
+		</div>
+	);
+
 	return (
-		<div ref={rootRef} style={{ position: "relative" }}>
-			<button
-				type="button"
-				aria-haspopup="listbox"
-				aria-expanded={open}
-				aria-label={messages.header.languageMenu}
-				onClick={() => setOpen((v) => !v)}
-				className="row center gap-8"
-				style={{
-					color: "var(--paper)",
-					fontSize: 13,
-					fontFamily: "var(--mono)",
-					letterSpacing: "0.1em",
-					border: "none",
-					background: "transparent",
-					cursor: "pointer",
-					padding: "6px 4px",
-				}}
-			>
-				<Icons.globe style={{ width: 16, height: 16 }} />
-				{cur.flag} {cur.code}
-			</button>
-			{open ? (
-				<div
-					role="listbox"
+		<>
+			<div ref={rootRef} style={{ position: "relative" }}>
+				<button
+					type="button"
+					aria-haspopup="listbox"
+					aria-expanded={open}
 					aria-label={messages.header.languageMenu}
+					onClick={() => setOpen((v) => !v)}
+					className="row center gap-8"
 					style={{
-						position: "absolute",
-						top: "calc(100% + 8px)",
-						...(align === "end" ? { right: 0 } : { left: 0 }),
-						minWidth: 220,
-						zIndex: 80,
-						borderRadius: 12,
-						border: "1px solid rgba(255,255,255,.12)",
-						background: "var(--paper)",
-						boxShadow: "0 16px 48px rgba(0,0,0,.35)",
-						padding: 6,
+						color: "var(--paper)",
+						fontSize: 13,
+						fontFamily: "var(--mono)",
+						letterSpacing: "0.1em",
+						border: "none",
+						background: "transparent",
+						cursor: "pointer",
+						padding: "6px 4px",
 					}}
 				>
-					{LANGUAGE_OPTIONS.map((opt) => (
-						<button
-							key={opt.locale}
-							type="button"
-							role="option"
-							aria-selected={opt.locale === locale}
-							onMouseDown={(e) => e.preventDefault()}
-							onClick={() => {
-								setLocale(opt.locale as Locale);
-								setOpen(false);
-								onPick?.();
-							}}
+					<Icons.globe style={{ width: 16, height: 16 }} />
+					{cur.flag} {cur.code}
+				</button>
+				{open && variant === "popover" ? listbox : null}
+			</div>
+			{open && variant === "sheet"
+				? createPortal(
+						<div
+							role="presentation"
 							style={{
+								position: "fixed",
+								inset: 0,
+								zIndex: 10000,
 								display: "flex",
-								width: "100%",
 								alignItems: "center",
-								gap: 10,
-								padding: "10px 12px",
-								border: "none",
-								borderRadius: 8,
-								background:
-									opt.locale === locale
-										? "rgba(124,216,90,.2)"
-										: "transparent",
-								color: "var(--ink)",
-								fontSize: 14,
-								textAlign: "left",
-								cursor: "pointer",
+								justifyContent: "center",
+								padding: 20,
+								boxSizing: "border-box",
+								background: "rgba(7,18,9,0.55)",
+								backdropFilter: "blur(10px)",
+							}}
+							onPointerDown={(e) => {
+								if (e.target === e.currentTarget) setOpen(false);
 							}}
 						>
-							<span style={{ fontSize: 16 }}>{opt.flag}</span>
-							<span className="mono" style={{ opacity: 0.75, minWidth: 40 }}>
-								{opt.code}
-							</span>
-							<span style={{ flex: 1 }}>{opt.label}</span>
-						</button>
-					))}
-				</div>
-			) : null}
-		</div>
+							{listbox}
+						</div>,
+						document.body,
+					)
+				: null}
+		</>
 	);
 }
 
@@ -432,6 +486,7 @@ export function Header() {
 						<div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 10 }}>
 							<div style={{ display: "flex", justifyContent: "center" }}>
 								<LanguagePicker
+									variant="sheet"
 									align="start"
 									onPick={() => setMenuOpen(false)}
 								/>
