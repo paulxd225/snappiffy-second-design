@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
 
-const data = [
+type QA = { q: string; a: string };
+
+const general: QA[] = [
 	{
 		q: "How much time does it take to develop my app?",
 		a: "It depends on complexity, but we can usually start shipping in around 4 weeks. We scope upfront so you know the exact roadmap before we start.",
@@ -28,12 +30,99 @@ const data = [
 		a: "You do. 100%. Full source handover at the end of every project, documented and ready for any team to take over.",
 	},
 ];
-const cats = ["General", "Pricing", "Process", "Support"];
+
+const pricing: QA[] = [
+	{
+		q: "How do you estimate cost before we start?",
+		a: "We align on goals, user flows, and integrations, then package a fixed scope with a clear milestone plan. You get a written estimate and timeline before any build work begins.",
+	},
+	{
+		q: "What's included in the starting price vs add-ons?",
+		a: "The starting package covers design, development, QA, and a production launch for the agreed feature set. Add-ons are things like extra platforms, advanced AI, or third-party certifications — quoted separately.",
+	},
+	{
+		q: "Do you charge for revisions during the build?",
+		a: "Reasonable iterations inside the agreed scope are included. If priorities shift into new features or a major pivot, we document the delta and price it as a change request so there are no surprises.",
+	},
+	{
+		q: "How do deposits and milestones work?",
+		a: "We typically split payments across milestones — kickoff, core build, and launch — so cash flow matches delivery. Exact splits are spelled out in the proposal you approve up front.",
+	},
+	{
+		q: "Can we start smaller and expand later?",
+		a: "Yes. Many teams ship an MVP first, then fund phases two and three from traction. We architect with that path in mind so growth doesn't mean a rewrite.",
+	},
+	{
+		q: "What happens if we pause or cancel mid-project?",
+		a: "Work billed to the current milestone is due; we hand over what's completed along with notes and access. If you return later, we pick up from the last agreed checkpoint.",
+	},
+];
+
+const process: QA[] = [
+	{
+		q: "What happens right after we sign?",
+		a: "We schedule a kickoff, confirm stakeholders, and set up your client portal with milestones, files, and weekly updates. Engineering starts once access and assets are in place.",
+	},
+	{
+		q: "How will we track progress day to day?",
+		a: "You'll see tasks move across stages in the portal, plus a standing summary of what's done, what's next, and any decisions waiting on you.",
+	},
+	{
+		q: "Who is our main point of contact?",
+		a: "A dedicated project manager coordinates design, engineering, and QA. Technical questions route to the right specialist without you chasing individuals.",
+	},
+	{
+		q: "How often do we meet or get updates?",
+		a: "Most teams prefer a weekly sync plus async updates in the portal. If we're in a crunch week, we can temporarily increase touchpoints.",
+	},
+	{
+		q: "What do you need from us to move fast?",
+		a: "Brand assets, access to any APIs or accounts, product decisions, and timely feedback on reviews. A single approver on your side removes bottlenecks.",
+	},
+	{
+		q: "How is QA and launch handled?",
+		a: "We run structured QA, a UAT window with you, then deploy to production with monitoring and rollback notes. Post-launch we stay close for stabilization.",
+	},
+];
+
+const support: QA[] = [
+	{
+		q: "What's included in a maintenance plan?",
+		a: "Security patches, dependency updates, small bug fixes, store compliance updates, and a monthly health check. Larger features are scoped as separate work.",
+	},
+	{
+		q: "How fast can you respond to incidents?",
+		a: "Critical production issues are triaged immediately during business hours, with a clear escalation path. Exact targets are defined in your maintenance tier.",
+	},
+	{
+		q: "Do you help with app store rejections or reviews?",
+		a: "Yes — we prepare metadata, screenshots, and review notes, then iterate with you if Apple or Google requests changes.",
+	},
+	{
+		q: "Can you train our team on the codebase?",
+		a: "We provide walkthrough sessions, READMEs, and environment setup docs. If you onboard engineers later, we can do a focused handoff workshop.",
+	},
+	{
+		q: "How do we request new features after launch?",
+		a: "Open a ticket in the portal or email your PM. We'll estimate impact, schedule it against your retainer or quote a milestone if it's larger.",
+	},
+	{
+		q: "Is there an SLA for production outages?",
+		a: "Maintenance tiers include defined response windows for production-down events. Non-production or cosmetic issues are handled in the regular queue.",
+	},
+];
+
+const cats = ["General", "Pricing", "Process", "Support"] as const;
+const faqSets: QA[][] = [general, pricing, process, support];
+
+const ANSWER_MAX_PX = 360;
 
 export function FAQ() {
 	const ref = useReveal();
-	const [open, setOpen] = useState(0);
+	const [open, setOpen] = useState(-1);
 	const [cat, setCat] = useState(0);
+	const items = faqSets[cat];
+	const activeCat = cats[cat];
 
 	return (
 		<section
@@ -89,7 +178,11 @@ export function FAQ() {
 								<button
 									type="button"
 									key={c}
-									onClick={() => setCat(i)}
+									aria-pressed={i === cat}
+									onClick={() => {
+										setCat(i);
+										setOpen(-1);
+									}}
 									style={{
 										textAlign: "left",
 										padding: "10px 14px",
@@ -124,10 +217,13 @@ export function FAQ() {
 						</a>
 					</div>
 
-					<div style={{ flex: 1, minWidth: 320 }}>
-						{data.map((it, i) => (
+					<section
+						aria-label={`${activeCat} questions`}
+						style={{ flex: 1, minWidth: 320 }}
+					>
+						{items.map((it, i) => (
 							<div
-								key={it.q}
+								key={`${activeCat}:${it.q}`}
 								style={{ borderBottom: "1px solid rgba(255,255,255,.08)" }}
 							>
 								<button
@@ -188,7 +284,7 @@ export function FAQ() {
 								<div
 									style={{
 										overflow: "hidden",
-										maxHeight: open === i ? 200 : 0,
+										maxHeight: open === i ? ANSWER_MAX_PX : 0,
 										opacity: open === i ? 1 : 0,
 										transition:
 											"max-height .5s cubic-bezier(.2,.7,.2,1), opacity .3s",
@@ -209,7 +305,7 @@ export function FAQ() {
 								</div>
 							</div>
 						))}
-					</div>
+					</section>
 				</div>
 			</div>
 		</section>
