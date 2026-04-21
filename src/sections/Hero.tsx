@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import heroBg from "../assets/hero-bg.jpg";
+import manuelFerrerPhoto from "../assets/manuelferrer.webp";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
 
@@ -26,7 +27,7 @@ const techStack = [
 	{ n: "Nest", c: "#e0234e" },
 	{ n: "Node", c: "#68a063" },
 	{ n: "TypeScript", c: "#3178c6" },
-	{ n: "OpenAI", c: "#10a37f" },
+	{ n: "Claude", c: "#10a37f" },
 	{ n: "Anthropic", c: "#c084ff" },
 ];
 
@@ -443,12 +444,38 @@ export function Hero() {
 					<div className="row center gap-12">
 						<div
 							style={{
-								width: 36,
-								height: 36,
+								width: 48,
+								height: 48,
+								boxSizing: "border-box",
+								padding: 2,
 								borderRadius: 999,
-								background: "linear-gradient(135deg, #9b5cff, #ff3df0)",
+								background:
+									"linear-gradient(135deg, #9b5cff 0%, #c084ff 45%, #ff3df0 100%)",
+								flexShrink: 0,
 							}}
-						/>
+						>
+							<div
+								style={{
+									width: "100%",
+									height: "100%",
+									borderRadius: 999,
+									overflow: "hidden",
+									background: "rgba(7,18,9,0.25)",
+								}}
+							>
+								<img
+									src={manuelFerrerPhoto}
+									alt="Manuel Ferrer"
+									draggable={false}
+									style={{
+										width: "100%",
+										height: "100%",
+										objectFit: "cover",
+										display: "block",
+									}}
+								/>
+							</div>
+						</div>
 						<div style={{ fontSize: 13 }}>
 							<b>Manuel Ferrer</b>{" "}
 							<span

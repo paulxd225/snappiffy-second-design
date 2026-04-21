@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
 import { useScrollDirection } from "../hooks/use-scroll-direction";
+import manuelFerrerPhoto from "../assets/manuelferrer.webp";
 import claude from "../assets/platform_logos/claude.svg";
 import css3 from "../assets/platform_logos/css-3.svg";
 import firebase from "../assets/platform_logos/firebase.svg";
@@ -36,7 +37,7 @@ const logos: LogoItem[] = [
 	{
 		id: "html-css-js",
 		label: "HTML, CSS, JS",
-		x: 0.08,
+		x: 0.1,
 		y: 0.2,
 		variant: "triple",
 		srcs: [html1, css3, javascriptR],
@@ -87,7 +88,7 @@ function ConstellationBand({ v }: { v: number }) {
 			<svg
 				width="100%"
 				height="160"
-				style={{ position: "absolute", inset: 0, opacity: 0.2 }}
+				style={{ position: "absolute", inset: 0, opacity: 0.45 }}
 			>
 				<title>Tech Stack Constellation</title>
 				<defs>
@@ -107,6 +108,7 @@ function ConstellationBand({ v }: { v: number }) {
 								y2={logos[i + 1].y * 160}
 								stroke="url(#constLine)"
 								strokeWidth="1"
+								strokeOpacity="0.65"
 							/>
 						),
 				)}
@@ -322,12 +324,37 @@ export function About() {
 								style={{
 									width: 48,
 									height: 48,
+									boxSizing: "border-box",
+									padding: 2,
 									borderRadius: 999,
-									background: "linear-gradient(135deg, #9b5cff, #ff3df0)",
-									border: "3px solid white",
+									background:
+										"linear-gradient(135deg, #9b5cff 0%, #c084ff 45%, #ff3df0 100%)",
 									boxShadow: "0 6px 16px -6px rgba(0,0,0,.2)",
+									flexShrink: 0,
 								}}
-							/>
+							>
+								<div
+									style={{
+										width: "100%",
+										height: "100%",
+										borderRadius: 999,
+										overflow: "hidden",
+										background: "rgba(7,18,9,0.06)",
+									}}
+								>
+									<img
+										src={manuelFerrerPhoto}
+										alt="Manuel Ferrer"
+										draggable={false}
+										style={{
+											width: "100%",
+											height: "100%",
+											objectFit: "cover",
+											display: "block",
+										}}
+									/>
+								</div>
+							</div>
 							<div>
 								<div style={{ fontWeight: 600, color: "var(--ink)" }}>
 									Manuel Ferrer{" "}
