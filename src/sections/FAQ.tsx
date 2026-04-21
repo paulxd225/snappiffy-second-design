@@ -1,39 +1,34 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
+import { useLanguage } from "../i18n/LanguageContext";
 
-const data = [
-	{
-		q: "How much time does it take to develop my app?",
-		a: "It depends on complexity, but we can usually start shipping in around 4 weeks. We scope upfront so you know the exact roadmap before we start.",
-	},
-	{
-		q: "What types of projects are you able to do?",
-		a: "Every concept, really. Mobile apps, web apps, dashboards, marketplaces, AI integrations, automation pipelines. If it runs on software, we can build it.",
-	},
-	{
-		q: "Do you work with international clients?",
-		a: "Yes. Most of our work is remote. On-site visits are only available within Ohio, but everything else is handled via video calls and our client portal.",
-	},
-	{
-		q: "What is your pricing model?",
-		a: "Fixed scope, fixed price for the first version. Starting at $3,999 depending on complexity. Follow-on work is monthly retainer or milestone-based — you choose.",
-	},
-	{
-		q: "Do you help with ongoing maintenance?",
-		a: "Of course. Handoff isn't the end. We offer maintenance plans so you have a team on-call when something breaks, when the app store updates, or when you want new features.",
-	},
-	{
-		q: "Who owns the code?",
-		a: "You do. 100%. Full source handover at the end of every project, documented and ready for any team to take over.",
-	},
-];
-const cats = ["General", "Pricing", "Process", "Support"];
+type QA = { q: string; a: string };
+
+const ANSWER_MAX_PX = 360;
 
 export function FAQ() {
+	const { messages, locale } = useLanguage();
+	const faqSets = useMemo<QA[][]>(
+		() => [
+			messages.faq.general,
+			messages.faq.pricing,
+			messages.faq.process,
+			messages.faq.support,
+		],
+		[messages],
+	);
+	const cats = messages.faq.categories;
 	const ref = useReveal();
-	const [open, setOpen] = useState(0);
+	const [open, setOpen] = useState(-1);
 	const [cat, setCat] = useState(0);
+	const items = faqSets[cat] ?? faqSets[0];
+	const activeCat = cats[cat] ?? cats[0];
+
+	useEffect(() => {
+		setOpen(-1);
+		setCat(0);
+	}, [locale]);
 
 	return (
 		<section
@@ -65,12 +60,12 @@ export function FAQ() {
 				>
 					<div style={{ flex: "0 0 340px" }}>
 						<div className="eyebrow" style={{ marginBottom: 20 }}>
-							FAQ
+							{messages.faq.eyebrow}
 						</div>
 						<h2 style={{ marginBottom: 24 }}>
-							Questions? <br />
+							{messages.faq.titleBefore} <br />
 							<span className="serif-italic" style={{ color: "#c084ff" }}>
-								We have answers.
+								{messages.faq.titleHighlight}
 							</span>
 						</h2>
 						<p
@@ -81,15 +76,18 @@ export function FAQ() {
 								marginBottom: 28,
 							}}
 						>
-							Can't find what you're looking for? Book a discovery call and
-							we'll answer directly.
+							{messages.faq.intro}
 						</p>
 						<div className="col gap-8" style={{ marginBottom: 28 }}>
 							{cats.map((c, i) => (
 								<button
 									type="button"
 									key={c}
-									onClick={() => setCat(i)}
+									aria-pressed={i === cat}
+									onClick={() => {
+										setCat(i);
+										setOpen(-1);
+									}}
 									style={{
 										textAlign: "left",
 										padding: "10px 14px",
@@ -119,15 +117,18 @@ export function FAQ() {
 							className="btn btn-primary"
 							style={{ padding: "12px 20px" }}
 						>
-							Ask a question{" "}
+							{messages.faq.askQuestion}{" "}
 							<Icons.arrow className="chev" style={{ width: 14, height: 14 }} />
 						</a>
 					</div>
 
-					<div style={{ flex: 1, minWidth: 320 }}>
-						{data.map((it, i) => (
+					<section
+						aria-label={`${activeCat} questions`}
+						style={{ flex: 1, minWidth: 320 }}
+					>
+						{items.map((it, i) => (
 							<div
-								key={it.q}
+								key={`${activeCat}:${it.q}`}
 								style={{ borderBottom: "1px solid rgba(255,255,255,.08)" }}
 							>
 								<button
@@ -188,7 +189,7 @@ export function FAQ() {
 								<div
 									style={{
 										overflow: "hidden",
-										maxHeight: open === i ? 200 : 0,
+										maxHeight: open === i ? ANSWER_MAX_PX : 0,
 										opacity: open === i ? 1 : 0,
 										transition:
 											"max-height .5s cubic-bezier(.2,.7,.2,1), opacity .3s",
@@ -209,7 +210,7 @@ export function FAQ() {
 								</div>
 							</div>
 						))}
-					</div>
+					</section>
 				</div>
 			</div>
 		</section>

@@ -1,7 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import heroBg from "../assets/hero-bg.jpg";
+import manuelFerrerPhoto from "../assets/manuelferrer.webp";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
+import { useLanguage } from "../i18n/LanguageContext";
+
+const MS_PER_CHAR = 85;
+const PAUSE_AFTER_PHRASE_MS = 1000;
 
 const techStack = [
 	{ n: "Supabase", c: "#3ecf8e" },
@@ -13,11 +18,17 @@ const techStack = [
 	{ n: "Nest", c: "#e0234e" },
 	{ n: "Node", c: "#68a063" },
 	{ n: "TypeScript", c: "#3178c6" },
-	{ n: "OpenAI", c: "#10a37f" },
+	{ n: "Claude", c: "#10a37f" },
 	{ n: "Anthropic", c: "#c084ff" },
 ];
 
-function TechMarquee() {
+function TechMarquee({
+	stackEyebrow,
+	productionGrade,
+}: {
+	stackEyebrow: string;
+	productionGrade: string;
+}) {
 	return (
 		<div
 			style={{
@@ -32,7 +43,7 @@ function TechMarquee() {
 				style={{ maxWidth: 1400, margin: "0 auto 20px", padding: "0 4px" }}
 			>
 				<div className="eyebrow" style={{ color: "#a8e88a" }}>
-					The stack we use
+					{stackEyebrow}
 				</div>
 				<div
 					className="mono"
@@ -42,7 +53,7 @@ function TechMarquee() {
 						letterSpacing: "0.12em",
 					}}
 				>
-					PRODUCTION-GRADE
+					{productionGrade}
 				</div>
 			</div>
 			<div
@@ -95,10 +106,38 @@ function TechMarquee() {
 	);
 }
 
+type CyclePhase = "hold" | "deleting" | "typing";
+
 export function Hero() {
+	const { messages, locale } = useLanguage();
+	const prefix = messages.hero.prefix;
+	const phrases = messages.hero.phrases;
+	const introTarget = useMemo(
+		() => `${prefix}${phrases[0]}`,
+		[prefix, phrases],
+	);
+
 	const ref = useReveal();
 	const mouseRef = useRef<HTMLElement>(null);
 	const [mp, setMp] = useState({ x: 0.5, y: 0.5 });
+
+	const [introProgress, setIntroProgress] = useState(0);
+	const [lineSplit, setLineSplit] = useState(false);
+	const postIntroReady = useRef(false);
+	const [tail, setTail] = useState("");
+	const [cyclePhase, setCyclePhase] = useState<CyclePhase | null>(null);
+	const [activeIdx, setActiveIdx] = useState(0);
+	const [typingTargetIndex, setTypingTargetIndex] = useState(0);
+
+	useEffect(() => {
+		postIntroReady.current = false;
+		setIntroProgress(0);
+		setLineSplit(false);
+		setTail("");
+		setCyclePhase(null);
+		setActiveIdx(0);
+		setTypingTargetIndex(0);
+	}, [locale]);
 
 	useEffect(() => {
 		const el = mouseRef.current;
@@ -113,6 +152,68 @@ export function Hero() {
 		el.addEventListener("mousemove", onMove);
 		return () => el.removeEventListener("mousemove", onMove);
 	}, []);
+
+	useEffect(() => {
+		if (introProgress >= introTarget.length) return;
+		const t = setTimeout(
+			() => setIntroProgress((p) => p + 1),
+			MS_PER_CHAR,
+		);
+		return () => clearTimeout(t);
+	}, [introProgress, introTarget.length]);
+
+	useLayoutEffect(() => {
+		if (introProgress < introTarget.length) return;
+		if (postIntroReady.current) return;
+		postIntroReady.current = true;
+		setLineSplit(true);
+		setTail(phrases[0]);
+		setActiveIdx(0);
+		setCyclePhase("hold");
+	}, [introProgress, introTarget.length, phrases]);
+
+	useEffect(() => {
+		if (introProgress < introTarget.length) return;
+		if (cyclePhase !== "hold") return;
+		const t = setTimeout(() => setCyclePhase("deleting"), PAUSE_AFTER_PHRASE_MS);
+		return () => clearTimeout(t);
+	}, [introProgress, introTarget.length, cyclePhase]);
+
+	useEffect(() => {
+		if (introProgress < introTarget.length) return;
+		if (cyclePhase !== "deleting") return;
+		if (tail.length === 0) {
+			const next = (activeIdx + 1) % phrases.length;
+			queueMicrotask(() => {
+				setTypingTargetIndex(next);
+				setCyclePhase("typing");
+			});
+			return;
+		}
+		const t = setTimeout(() => setTail((s) => s.slice(0, -1)), MS_PER_CHAR);
+		return () => clearTimeout(t);
+	}, [introProgress, introTarget.length, cyclePhase, tail, activeIdx, phrases.length]);
+
+	useEffect(() => {
+		if (introProgress < introTarget.length) return;
+		if (cyclePhase !== "typing") return;
+		const target = phrases[typingTargetIndex];
+		if (tail.length >= target.length) {
+			const finishedIdx = typingTargetIndex;
+			queueMicrotask(() => {
+				setActiveIdx(finishedIdx);
+				setCyclePhase("hold");
+			});
+			return;
+		}
+		const t = setTimeout(() => {
+			setTail((prev) => {
+				if (prev.length >= target.length) return prev;
+				return target.slice(0, prev.length + 1);
+			});
+		}, MS_PER_CHAR);
+		return () => clearTimeout(t);
+	}, [introProgress, introTarget.length, cyclePhase, tail, typingTargetIndex, phrases]);
 
 	return (
 		<section
@@ -233,14 +334,29 @@ export function Hero() {
 								boxShadow: "0 0 12px #7cd85a",
 							}}
 						/>
-						Trusted since 2022 · 40+ apps shipped
+						{messages.hero.trusted}
 					</div>
 				</div>
 
-				<h1 style={{ maxWidth: 1100, marginBottom: 24, color: "#ffffff" }}>
-					Custom mobile apps,
-					<br />
+				<h1
+					style={{ maxWidth: 1100, marginBottom: 24, color: "#ffffff" }}
+					aria-label={messages.hero.heroAria}
+				>
+					<span aria-hidden="true" style={{ display: "inline" }}>
+						{introProgress < introTarget.length
+							? introTarget.slice(0, introProgress)
+							: !lineSplit
+								? introTarget
+								: (
+										<>
+											{prefix}
+											{tail}
+										</>
+									)}
+					</span>
+					<br aria-hidden="true" />
 					<span
+						aria-hidden="true"
 						style={{
 							background:
 								"linear-gradient(100deg, #c084ff 0%, #9b5cff 55%, #a47bff 100%)",
@@ -249,14 +365,15 @@ export function Hero() {
 							color: "transparent",
 						}}
 					>
-						powered by AI
+						{messages.hero.poweredBy}
 					</span>
-					<br />
+					<br aria-hidden="true" />
 					<span
 						className="serif-italic"
+						aria-hidden="true"
 						style={{ fontSize: "0.62em", color: "#eefbe9", opacity: 0.9 }}
 					>
-						— tailored to your business.
+						{messages.hero.tailored}
 					</span>
 				</h1>
 
@@ -269,8 +386,7 @@ export function Hero() {
 						marginBottom: 40,
 					}}
 				>
-					Bring your business idea to life in just a few weeks. Starting from{" "}
-					<b>$3,999</b>. Cheaper, faster, smarter — and built to scale with you.
+					{messages.hero.subtitle}
 				</p>
 
 				<div
@@ -278,14 +394,19 @@ export function Hero() {
 					style={{ marginBottom: 60, flexWrap: "wrap" }}
 				>
 					<a href="#contact" className="btn btn-primary">
-						Book a free visit{" "}
+						{messages.hero.bookFree}{" "}
 						<Icons.arrow className="chev" style={{ width: 16, height: 16 }} />
 					</a>
 					<a href="#case-study" className="btn btn-ghost">
-						<Icons.play style={{ width: 12, height: 12 }} /> See our work
+						<Icons.play style={{ width: 12, height: 12 }} /> {messages.hero.seeWork}
 					</a>
 					<div className="row gap-16 center" style={{ marginLeft: 8 }}>
-						{["Cheaper", "Faster", "Smarter", "Scalable"].map((w) => (
+						{[
+							messages.hero.pillCheaper,
+							messages.hero.pillFaster,
+							messages.hero.pillSmarter,
+							messages.hero.pillScalable,
+						].map((w) => (
 							<div
 								key={w}
 								className="row center gap-8"
@@ -336,18 +457,43 @@ export function Hero() {
 							color: "#eefbe9",
 						}}
 					>
-						"AI is changing the rules of the game in every industry. If you
-						don't incorporate it into your company, your competition will."
+						{messages.hero.quote}
 					</p>
 					<div className="row center gap-12">
 						<div
 							style={{
-								width: 36,
-								height: 36,
+								width: 48,
+								height: 48,
+								boxSizing: "border-box",
+								padding: 2,
 								borderRadius: 999,
-								background: "linear-gradient(135deg, #9b5cff, #ff3df0)",
+								background:
+									"linear-gradient(135deg, #9b5cff 0%, #c084ff 45%, #ff3df0 100%)",
+								flexShrink: 0,
 							}}
-						/>
+						>
+							<div
+								style={{
+									width: "100%",
+									height: "100%",
+									borderRadius: 999,
+									overflow: "hidden",
+									background: "rgba(7,18,9,0.25)",
+								}}
+							>
+								<img
+									src={manuelFerrerPhoto}
+									alt="Manuel Ferrer"
+									draggable={false}
+									style={{
+										width: "100%",
+										height: "100%",
+										objectFit: "cover",
+										display: "block",
+									}}
+								/>
+							</div>
+						</div>
 						<div style={{ fontSize: 13 }}>
 							<b>Manuel Ferrer</b>{" "}
 							<span
@@ -359,7 +505,7 @@ export function Hero() {
 									letterSpacing: "0.1em",
 								}}
 							>
-								CEO · SNAPPIFFY
+								{messages.hero.ceoLine}
 							</span>
 						</div>
 						<div className="row gap-8" style={{ marginLeft: "auto" }}>
@@ -373,7 +519,10 @@ export function Hero() {
 				</div>
 			</div>
 
-			<TechMarquee />
+			<TechMarquee
+				stackEyebrow={messages.hero.stackEyebrow}
+				productionGrade={messages.hero.productionGrade}
+			/>
 		</section>
 	);
 }

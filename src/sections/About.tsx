@@ -1,21 +1,107 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
 import { useScrollDirection } from "../hooks/use-scroll-direction";
+import { useLanguage } from "../i18n/LanguageContext";
+import manuelFerrerPhoto from "../assets/manuelferrer.webp";
+import claude from "../assets/platform_logos/claude.svg";
+import css3 from "../assets/platform_logos/css-3.svg";
+import firebase from "../assets/platform_logos/firebase.svg";
+import flutter from "../assets/platform_logos/flutter.svg";
+import flutterflow from "../assets/platform_logos/flutterflow.svg";
+import html1 from "../assets/platform_logos/html-1.svg";
+import javascriptR from "../assets/platform_logos/javascript-r.svg";
+import nestjs from "../assets/platform_logos/nestjs.svg";
+import nodejs from "../assets/platform_logos/nodejs.svg";
+import react from "../assets/platform_logos/react.svg";
+import typescript from "../assets/platform_logos/typescript.svg";
 
-const logos = [
-	{ n: "Supabase", c: "#3ecf8e", x: 0.08, y: 0.2 },
-	{ n: "React", c: "#61dafb", x: 0.22, y: 0.55 },
-	{ n: "Flutter", c: "#54c5f8", x: 0.38, y: 0.15 },
-	{ n: "FlutterFlow", c: "#9b5cff", x: 0.55, y: 0.6 },
-	{ n: "Firebase", c: "#ffa000", x: 0.72, y: 0.22 },
-	{ n: "Nest", c: "#e0234e", x: 0.86, y: 0.55 },
-	{ n: "Node", c: "#68a063", x: 0.1, y: 0.85 },
-	{ n: "TypeScript", c: "#3178c6", x: 0.45, y: 0.9 },
-	{ n: "OpenAI", c: "#10a37f", x: 0.78, y: 0.88 },
+const MOBILE_MQ = "(max-width: 900px)";
+
+function subscribeMobile(cb: () => void) {
+	const mq = window.matchMedia(MOBILE_MQ);
+	mq.addEventListener("change", cb);
+	return () => mq.removeEventListener("change", cb);
+}
+
+function getMobileSnapshot() {
+	return window.matchMedia(MOBILE_MQ).matches;
+}
+
+function getMobileServerSnapshot() {
+	return false;
+}
+
+type LogoItem =
+	| {
+			id: string;
+			label: string;
+			x: number;
+			y: number;
+			variant: "single";
+			src: string;
+	  }
+	| {
+			id: string;
+			label: string;
+			x: number;
+			y: number;
+			variant: "triple";
+			srcs: [string, string, string];
+	  };
+
+const logos: LogoItem[] = [
+	{
+		id: "html-css-js",
+		label: "HTML, CSS, JS",
+		x: 0.1,
+		y: 0.2,
+		variant: "triple",
+		srcs: [html1, css3, javascriptR],
+	},
+	{ id: "react", label: "React", x: 0.22, y: 0.55, variant: "single", src: react },
+	{ id: "flutter", label: "Flutter", x: 0.38, y: 0.15, variant: "single", src: flutter },
+	{
+		id: "flutterflow",
+		label: "FlutterFlow",
+		x: 0.55,
+		y: 0.6,
+		variant: "single",
+		src: flutterflow,
+	},
+	{ id: "firebase", label: "Firebase", x: 0.72, y: 0.22, variant: "single", src: firebase },
+	{ id: "nest", label: "Nest", x: 0.86, y: 0.55, variant: "single", src: nestjs },
+	{ id: "node", label: "Node.js", x: 0.1, y: 0.85, variant: "single", src: nodejs },
+	{
+		id: "typescript",
+		label: "TypeScript",
+		x: 0.45,
+		y: 0.9,
+		variant: "single",
+		src: typescript,
+	},
+	{ id: "claude", label: "Claude", x: 0.78, y: 0.88, variant: "single", src: claude },
 ];
 
-function ConstellationBand({ v }: { v: number }) {
+function ConstellationBand({ v, svgTitle }: { v: number; svgTitle: string }) {
+	const isMobile = useSyncExternalStore(
+		subscribeMobile,
+		getMobileSnapshot,
+		getMobileServerSnapshot,
+	);
+	const bandH = isMobile ? 120 : 200;
+	const svgH = isMobile ? 96 : 160;
+	const padX = isMobile ? 7.2 : 12;
+	const padY = isMobile ? 6 : 10;
+	const padBottom = isMobile ? 7.2 : 12;
+	const minW = isMobile ? 43.2 : 72;
+	const tripleGap = isMobile ? 2.4 : 4;
+	const tripleMinH = isMobile ? 19.2 : 32;
+	const tripleIcon = isMobile ? 13.2 : 22;
+	const singleH = isMobile ? 36 : 60;
+	const singleW = isMobile ? 48 : 80;
+	const labelSize = isMobile ? 9 : 15;
+
 	const [offset, setOffset] = useState(0);
 	useEffect(() => {
 		const id = requestAnimationFrame(() => {
@@ -27,19 +113,19 @@ function ConstellationBand({ v }: { v: number }) {
 		<div
 			style={{
 				position: "relative",
-				height: 160,
+				height: bandH,
 				width: "100%",
 				overflow: "hidden",
 				borderBottom: "1px solid rgba(14,63,21,.08)",
-				marginBottom: 20,
+				marginBottom: 10,
 			}}
 		>
 			<svg
 				width="100%"
-				height="160"
-				style={{ position: "absolute", inset: 0, opacity: 0.2 }}
+				height={svgH}
+				style={{ position: "absolute", inset: 0, opacity: 0.45 }}
 			>
-				<title>Tech Stack Constellation</title>
+				<title>{svgTitle}</title>
 				<defs>
 					<linearGradient id="constLine" x1="0" x2="1">
 						<stop offset="0" stopColor="#1e7a24" />
@@ -50,53 +136,89 @@ function ConstellationBand({ v }: { v: number }) {
 					(it, i) =>
 						i < logos.length - 1 && (
 							<line
-								key={it.n}
+								key={`${it.id}-line`}
 								x1={`${(it.x * 120 + offset * 0.05) % 100}%`}
-								y1={it.y * 160}
-								x2={`${(logos[logos.indexOf(it) + 1].x * 120 + offset * 0.05) % 100}%`}
-								y2={logos[logos.indexOf(it) + 1].y * 160}
+								y1={it.y * svgH}
+								x2={`${(logos[i + 1].x * 120 + offset * 0.05) % 100}%`}
+								y2={logos[i + 1].y * svgH}
 								stroke="url(#constLine)"
 								strokeWidth="1"
+								strokeOpacity="0.65"
 							/>
 						),
 				)}
 			</svg>
 			{logos.map((it) => (
 				<div
-					key={it.n}
+					key={it.id}
 					style={{
 						position: "absolute",
 						left: `${(((it.x * 120 + offset * 0.05) % 100) + 100) % 100}%`,
-						top: it.y * 160 - 16,
+						top: it.y * svgH,
 						transition: "transform .6s cubic-bezier(.2,.7,.2,1)",
-						transform: `translateX(${v * 0.4}px)`,
+						transform: `translate(-50%, -50%) translateX(${v * 0.4}px)`,
 					}}
 				>
 					<div
-						className="row center gap-8"
+						className="col center"
 						style={{
-							padding: "8px 14px",
-							background: "white",
-							borderRadius: 999,
+							padding: `${padY}px ${padX}px ${padBottom}px`,
+							minWidth: minW,
+							background: "none",
+							borderRadius: 16,
 							boxShadow:
 								"0 8px 24px -12px rgba(0,0,0,.12), 0 2px 6px -2px rgba(0,0,0,.06)",
 							border: "1px solid rgba(14,63,21,.08)",
-							fontSize: 13,
-							fontWeight: 500,
-							color: "var(--ink)",
-							whiteSpace: "nowrap",
+							gap: 2,
 						}}
 					>
+						{it.variant === "triple" ? (
+							<div
+								className="row center"
+								style={{
+									gap: tripleGap,
+									minHeight: tripleMinH,
+									alignItems: "center",
+								}}
+							>
+								{it.srcs.map((src) => (
+									<img
+										key={src}
+										src={src}
+										alt=""
+										draggable={false}
+										style={{
+											height: tripleIcon,
+											width: tripleIcon,
+											objectFit: "contain",
+										}}
+									/>
+								))}
+							</div>
+						) : (
+							<img
+								src={it.src}
+								alt=""
+								draggable={false}
+								style={{
+									height: singleH,
+									width: singleW,
+									objectFit: "contain",
+								}}
+							/>
+						)}
 						<span
 							style={{
-								width: 8,
-								height: 8,
-								borderRadius: 2,
-								background: it.c,
-								boxShadow: `0 0 8px ${it.c}`,
+								fontSize: labelSize,
+								fontWeight: 600,
+								letterSpacing: "0.02em",
+								color: "var(--ink)",
+								textAlign: "center",
+								lineHeight: 1.2,
 							}}
-						/>
-						{it.n}
+						>
+							{it.label}
+						</span>
 					</div>
 				</div>
 			))}
@@ -104,7 +226,7 @@ function ConstellationBand({ v }: { v: number }) {
 	);
 }
 
-function VideoCard() {
+function VideoCard({ videoTitle }: { videoTitle: string }) {
 	const [playing, setPlaying] = useState(false);
 	return (
 		<div
@@ -121,7 +243,7 @@ function VideoCard() {
 			{playing ? (
 				<iframe
 					src="https://www.youtube.com/embed/iTCx-iAFJ9A?autoplay=1&rel=0"
-					title="Introduction to Snappiffy"
+					title={videoTitle}
 					frameBorder="0"
 					allow="autoplay; encrypted-media; picture-in-picture"
 					allowFullScreen
@@ -137,7 +259,7 @@ function VideoCard() {
 				<>
 					<img
 						src="https://img.youtube.com/vi/iTCx-iAFJ9A/maxresdefault.jpg"
-						alt="Introduction to Snappiffy"
+						alt={videoTitle}
 						style={{
 							position: "absolute",
 							inset: 0,
@@ -202,6 +324,7 @@ function VideoCard() {
 }
 
 export function About() {
+	const { messages } = useLanguage();
 	const ref = useReveal();
 	const v = useScrollDirection();
 
@@ -211,7 +334,10 @@ export function About() {
 			className="section light"
 			style={{ paddingTop: 120, paddingBottom: 140, overflow: "hidden" }}
 		>
-			<ConstellationBand v={v} />
+			<ConstellationBand
+				v={v}
+				svgTitle={messages.about.constellationTitle}
+			/>
 			<div ref={ref} className="container reveal" style={{ paddingTop: 80 }}>
 				<div
 					className="row between"
@@ -219,14 +345,14 @@ export function About() {
 				>
 					<div style={{ flex: "1 1 440px", maxWidth: 540 }}>
 						<div className="eyebrow" style={{ marginBottom: 24 }}>
-							About Snappiffy
+							{messages.about.eyebrow}
 						</div>
 						<h2 style={{ marginBottom: 28, color: "var(--ink)" }}>
-							We empower business with{" "}
+							{messages.about.titleBefore}{" "}
 							<span className="serif-italic" style={{ color: "#9b5cff" }}>
-								custom mobile apps
+								{messages.about.titleHighlight}
 							</span>
-							, powered by AI.
+							{messages.about.titleAfter}
 						</h2>
 						<p
 							style={{
@@ -236,21 +362,44 @@ export function About() {
 								marginBottom: 32,
 							}}
 						>
-							Significantly improve your business processes and save a ton of
-							money at the same time. We combine custom mobile development with
-							the real power of AI — no hype, just leverage.
+							{messages.about.body}
 						</p>
 						<div className="row center gap-12" style={{ marginBottom: 40 }}>
 							<div
 								style={{
 									width: 48,
 									height: 48,
+									boxSizing: "border-box",
+									padding: 2,
 									borderRadius: 999,
-									background: "linear-gradient(135deg, #9b5cff, #ff3df0)",
-									border: "3px solid white",
+									background:
+										"linear-gradient(135deg, #9b5cff 0%, #c084ff 45%, #ff3df0 100%)",
 									boxShadow: "0 6px 16px -6px rgba(0,0,0,.2)",
+									flexShrink: 0,
 								}}
-							/>
+							>
+								<div
+									style={{
+										width: "100%",
+										height: "100%",
+										borderRadius: 999,
+										overflow: "hidden",
+										background: "rgba(7,18,9,0.06)",
+									}}
+								>
+									<img
+										src={manuelFerrerPhoto}
+										alt="Manuel Ferrer"
+										draggable={false}
+										style={{
+											width: "100%",
+											height: "100%",
+											objectFit: "cover",
+											display: "block",
+										}}
+									/>
+								</div>
+							</div>
 							<div>
 								<div style={{ fontWeight: 600, color: "var(--ink)" }}>
 									Manuel Ferrer{" "}
@@ -263,14 +412,14 @@ export function About() {
 											marginLeft: 6,
 										}}
 									>
-										CEO
+										{messages.about.ceo}
 									</span>
 								</div>
 								<div
 									style={{ fontSize: 13, color: "rgba(7,18,9,0.6)" }}
 									className="serif-italic"
 								>
-									Combining custom apps with AI power pays off.
+									{messages.about.ceoQuote}
 								</div>
 							</div>
 						</div>
@@ -279,9 +428,13 @@ export function About() {
 							style={{ gap: 0, borderTop: "1px solid rgba(14,63,21,.12)" }}
 						>
 							{[
-								{ k: "10x", l: "more efficiency in processes" },
-								{ k: "$170K", s: "/yr", l: "average savings" },
-								{ k: "80%+", l: "process optimization" },
+								{ k: "10x", l: messages.about.stat1 },
+								{
+									k: "$170K",
+									s: messages.about.stat2Suffix,
+									l: messages.about.stat2,
+								},
+								{ k: "80%+", l: messages.about.stat3 },
 							].map((s) => (
 								<div
 									key={s.k}
@@ -328,7 +481,7 @@ export function About() {
 					<div
 						style={{ flex: "1 1 480px", maxWidth: 620, position: "relative" }}
 					>
-						<VideoCard />
+						<VideoCard videoTitle={messages.about.videoTitle} />
 					</div>
 				</div>
 			</div>

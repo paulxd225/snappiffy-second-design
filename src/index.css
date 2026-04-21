@@ -85,6 +85,12 @@ body {
 }
 html {
 	scroll-behavior: smooth;
+	overflow-x: hidden;
+}
+
+#root {
+	overflow-x: hidden;
+	width: 100%;
 }
 
 body {
@@ -441,6 +447,14 @@ h3 {
 
 /* Responsive */
 @media (max-width: 900px) {
+	.benefits-orb {
+		width: 320px !important;
+		height: 320px !important;
+		top: 40px !important;
+		right: -40px !important;
+		filter: blur(96px) !important;
+	}
+
 	.section {
 		padding: 90px 20px !important;
 	}
@@ -465,7 +479,7 @@ h3 {
 		display: none !important;
 	}
 	header {
-		padding: 14px 16px !important;
+		padding: 14px 16px;
 	}
 }
 @media (max-width: 600px) {

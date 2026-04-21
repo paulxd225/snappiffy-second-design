@@ -1,37 +1,20 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
+import { useLanguage } from "../i18n/LanguageContext";
 
 type IconKey = keyof typeof Icons;
 
-const items: Array<{ t: string; d: string; ic: IconKey; c: string }> = [
-	{
-		t: "Restaurant / Entertainment",
-		d: "Restaurant related, event organization, online ticket sales, beverages, groceries and more.",
-		ic: "utensil",
-		c: "#ff3df0",
-	},
-	{
-		t: "Self-employed / Services",
-		d: "Lawyer, accountant, tax preparer, barber, fitness coach — or any service area.",
-		ic: "users",
-		c: "#9b5cff",
-	},
-	{
-		t: "Marketplaces / Retail",
-		d: "Online store, one-time & recurring payments, customer dashboard and inventory ops.",
-		ic: "cart",
-		c: "#7cd85a",
-	},
-	{
-		t: "AI-integrated processes",
-		d: "Analyze your ops to find automation opportunities and implement AI into your business.",
-		ic: "brain",
-		c: "#c084ff",
-	},
+type IndustryItem = { t: string; d: string; ic: IconKey; c: string };
+
+const INDUSTRY_META: Array<{ ic: IconKey; c: string }> = [
+	{ ic: "utensil", c: "#ff3df0" },
+	{ ic: "users", c: "#9b5cff" },
+	{ ic: "cart", c: "#7cd85a" },
+	{ ic: "brain", c: "#c084ff" },
 ];
 
-function IndustryCard({ it }: { it: (typeof items)[0] }) {
+function IndustryCard({ it }: { it: IndustryItem }) {
 	const ref = useRef<HTMLDivElement>(null);
 	const [tilt, setTilt] = useState({ x: 0, y: 0 });
 	const IconEl = Icons[it.ic];
@@ -124,6 +107,15 @@ function IndustryCard({ it }: { it: (typeof items)[0] }) {
 }
 
 export function Industries() {
+	const { messages } = useLanguage();
+	const items = useMemo<IndustryItem[]>(
+		() =>
+			messages.industries.items.map((it, i) => ({
+				...it,
+				...INDUSTRY_META[i],
+			})),
+		[messages],
+	);
 	const ref = useReveal();
 	return (
 		<section
@@ -141,12 +133,12 @@ export function Industries() {
 							marginBottom: 20,
 						}}
 					>
-						Shoulder to shoulder to succeed
+						{messages.industries.eyebrow}
 					</div>
 					<h2 style={{ color: "var(--ink)", maxWidth: 900, margin: "0 auto" }}>
-						What kind of industries{" "}
+						{messages.industries.titleBefore}{" "}
 						<span className="serif-italic" style={{ color: "#9b5cff" }}>
-							do we specialize in?
+							{messages.industries.titleHighlight}
 						</span>
 					</h2>
 				</div>

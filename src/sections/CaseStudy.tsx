@@ -1,4 +1,30 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import cilantro1 from "../assets/apps-examples/cilantro1.png";
+import cilantro2 from "../assets/apps-examples/cilantro2.png";
+import cilantro3 from "../assets/apps-examples/cilantro3.png";
+import cilantro4 from "../assets/apps-examples/cilantro4.png";
+import cilantro5 from "../assets/apps-examples/cilantro5.png";
+import cilantrologo from "../assets/apps-examples/cilantrologo.webp";
+import enterprises1 from "../assets/apps-examples/enterprises1.png";
+import enterprises2 from "../assets/apps-examples/enterprises2.png";
+import enterprises3 from "../assets/apps-examples/enterprises3.png";
+import enterprises4 from "../assets/apps-examples/enterprises4.png";
+import enterprises5 from "../assets/apps-examples/enterprises5.png";
+import enterpriseslogo from "../assets/apps-examples/enterpriseslogo.png";
+import ochurros1 from "../assets/apps-examples/ochurros1.webp";
+import ochurros2 from "../assets/apps-examples/ochurros2.webp";
+import ochurros3 from "../assets/apps-examples/ochurros3.webp";
+import ochurros4 from "../assets/apps-examples/ochurros4.webp";
+import ochurros5 from "../assets/apps-examples/ochurros5.webp";
+import ochurroslogo from "../assets/apps-examples/ochurroslogo.png";
+import shapewear1 from "../assets/apps-examples/shapewear1.png";
+import shapewear2 from "../assets/apps-examples/shapewear2.png";
+import shapewear3 from "../assets/apps-examples/shapewear3.png";
+import shapewear4 from "../assets/apps-examples/shapewear4.png";
+import shapewear5 from "../assets/apps-examples/shapewear5.png";
+import shapewearlogo from "../assets/apps-examples/shapewearlogo.png";
+import { useLanguage } from "../i18n/LanguageContext";
 
 const navBtnStyle: React.CSSProperties = {
 	width: 44,
@@ -11,59 +37,82 @@ const navBtnStyle: React.CSSProperties = {
 	transition: "all .3s",
 };
 
-const apps = [
+const CASE_APP_LAYOUT = [
 	{
-		name: "Oh Churros",
-		client: "Venezuelan Restaurant · Columbus OH",
-		who: "Michell Roa, Founder / Owner",
-		desc: "Handle inventory, show and rate products, send offer coupons, process payments and sell for pick-up — all in one app, deployed on the Apple App Store.",
-		color: "#ff3df0",
-		accent: "#c084ff",
-		screens: [
-			{ label: "Menu", theme: "light", palette: "#ff3df0" },
-			{ label: "Login", theme: "light", palette: "#ff7ae3" },
-			{ label: "Brand", theme: "pink", palette: "#ff3df0" },
-			{ label: "Discovery", theme: "dark", palette: "#c084ff" },
-			{ label: "Cart", theme: "light", palette: "#ff3df0" },
-		],
-	},
-	{
-		name: "Barber Select",
-		client: "Barbershop chain · Miami FL",
-		who: "Carlos Medina, CEO",
-		desc: "Booking, loyalty and push campaigns for a growing chain of premium barbershops — with an internal dashboard for shift & inventory management.",
-		color: "#c084ff",
-		accent: "#9b5cff",
-		screens: [
-			{ label: "Home", theme: "dark", palette: "#9b5cff" },
-			{ label: "Booking", theme: "light", palette: "#c084ff" },
-			{ label: "Stylists", theme: "dark", palette: "#9b5cff" },
-			{ label: "Loyalty", theme: "light", palette: "#c084ff" },
-			{ label: "Profile", theme: "dark", palette: "#9b5cff" },
-		],
-	},
-	{
-		name: "Gym Spot",
-		client: "Fitness chain · Ohio",
-		who: "Andrea Lopez, COO",
-		desc: "Workouts, programs and check-in. AI coach suggests routines based on progress.",
 		color: "#7cd85a",
 		accent: "#2ea02c",
 		screens: [
-			{ label: "Discover", theme: "dark", palette: "#7cd85a" },
-			{ label: "Workouts", theme: "dark", palette: "#2ea02c" },
-			{ label: "Coach", theme: "light", palette: "#7cd85a" },
-			{ label: "Stats", theme: "dark", palette: "#2ea02c" },
-			{ label: "Events", theme: "dark", palette: "#9b5cff" },
+			{ theme: "dark", palette: "#7cd85a" },
+			{ theme: "dark", palette: "#2ea02c" },
+			{ theme: "light", palette: "#7cd85a" },
+			{ theme: "dark", palette: "#2ea02c" },
+			{ theme: "dark", palette: "#4cc23a" },
 		],
 	},
-];
+	{
+		color: "#FFBFFB",
+		accent: "#c084ff",
+		logo: ochurroslogo,
+		screens: [
+			{ theme: "light", palette: "#ff3df0", image: ochurros1 },
+			{ theme: "light", palette: "#ff7ae3", image: ochurros2 },
+			{ theme: "pink", palette: "#ff3df0", image: ochurros3 },
+			{ theme: "dark", palette: "#c084ff", image: ochurros4 },
+			{ theme: "light", palette: "#ff3df0", image: ochurros5 },
+		],
+	},
+	{
+		color: "#052E85",
+		accent: "#0044cc",
+		logo: enterpriseslogo,
+		screens: [
+			{ theme: "light", palette: "#1e6bff", image: enterprises1 },
+			{ theme: "dark", palette: "#4d8fff", image: enterprises2 },
+			{ theme: "light", palette: "#0066ff", image: enterprises3 },
+			{ theme: "dark", palette: "#1e6bff", image: enterprises4 },
+			{ theme: "light", palette: "#4d8fff", image: enterprises5 },
+		],
+	},
+	{
+		color: "#7A651D",
+		accent: "#8b6914",
+		logo: shapewearlogo,
+		screens: [
+			{ theme: "light", palette: "#c9a227", image: shapewear1 },
+			{ theme: "dark", palette: "#d4b84a", image: shapewear2 },
+			{ theme: "light", palette: "#e6c84a", image: shapewear3 },
+			{ theme: "dark", palette: "#c9a227", image: shapewear4 },
+			{ theme: "light", palette: "#8b6914", image: shapewear5 },
+		],
+	},
+	{
+		color: "#0f0f0f",
+		accent: "#000",
+		logo: cilantrologo,
+		screens: [
+			{ theme: "dark", palette: "#2d6a4f", image: cilantro1 },
+			{ theme: "light", palette: "#40916c", image: cilantro2 },
+			{ theme: "dark", palette: "#1b4332", image: cilantro3 },
+			{ theme: "light", palette: "#2d6a4f", image: cilantro4 },
+			{ theme: "dark", palette: "#40916c", image: cilantro5 },
+		],
+	},
+] as const;
 
-type Screen = { label: string; theme: string; palette: string };
-type App = (typeof apps)[0];
+type Screen = { label: string; theme: string; palette: string; image?: string };
+type App = {
+	name: string;
+	client: string;
+	who: string;
+	desc: string;
+	color: string;
+	accent: string;
+	logo?: string;
+	screens: Screen[];
+};
 
 function PhoneFrame({ screen, app }: { screen: Screen; app: App }) {
-	const { theme, palette, label } = screen;
+	const { theme, palette, label, image } = screen;
 	const bg =
 		theme === "light" ? "#f6faf4" : theme === "pink" ? "#ffe1f3" : "#0e0e12";
 	const fg = theme === "dark" ? "white" : "#0e0e12";
@@ -103,146 +152,165 @@ function PhoneFrame({ screen, app }: { screen: Screen; app: App }) {
 						zIndex: 2,
 					}}
 				/>
-				<div
-					style={{
-						padding: "36px 14px 14px",
-						color: fg,
-						height: "100%",
-						display: "flex",
-						flexDirection: "column",
-					}}
-				>
-					<div
-						className="mono"
+				{image ? (
+					<img
+						src={image}
+						alt=""
+						draggable={false}
 						style={{
-							fontSize: 9,
-							letterSpacing: "0.2em",
-							opacity: 0.5,
-							textTransform: "uppercase",
+							position: "absolute",
+							inset: 0,
+							width: "100%",
+							height: "100%",
+							objectFit: "cover",
+							objectPosition: "top center",
+							zIndex: 0,
 						}}
-					>
-						{app.name}
-					</div>
+					/>
+				) : (
 					<div
 						style={{
-							fontSize: 20,
-							fontWeight: 600,
-							marginTop: 4,
-							letterSpacing: "-0.02em",
+							padding: "36px 14px 14px",
+							color: fg,
+							height: "100%",
+							display: "flex",
+							flexDirection: "column",
+							position: "relative",
+							zIndex: 1,
 						}}
 					>
-						{label}
-					</div>
-					<div
-						style={{
-							marginTop: 14,
-							display: "grid",
-							gridTemplateColumns: "1fr 1fr",
-							gap: 8,
-						}}
-					>
-						{[0, 1, 2, 3].map((i) => (
-							<div
-								key={i}
-								style={{
-									aspectRatio: "1",
-									borderRadius: 12,
-									background:
-										i % 2 === 0
-											? `linear-gradient(135deg, ${palette}, ${palette}77)`
-											: `linear-gradient(135deg, ${theme === "dark" ? "rgba(255,255,255,.08)" : "rgba(14,63,21,.06)"}, ${theme === "dark" ? "rgba(255,255,255,.02)" : "rgba(14,63,21,.02)"})`,
-									boxShadow:
-										i % 2 === 0 ? `0 4px 12px -4px ${palette}88` : "none",
-								}}
-							/>
-						))}
-					</div>
-					<div style={{ marginTop: 14, flex: 1 }}>
-						{[0, 1, 2].map((i) => (
-							<div
-								key={i}
-								className="row center gap-10"
-								style={{
-									padding: "8px 0",
-									borderBottom:
-										theme === "dark"
-											? "1px solid rgba(255,255,255,.06)"
-											: "1px solid rgba(14,63,21,.06)",
-								}}
-							>
+						<div
+							className="mono"
+							style={{
+								fontSize: 9,
+								letterSpacing: "0.2em",
+								opacity: 0.5,
+								textTransform: "uppercase",
+							}}
+						>
+							{app.name}
+						</div>
+						<div
+							style={{
+								fontSize: 20,
+								fontWeight: 600,
+								marginTop: 4,
+								letterSpacing: "-0.02em",
+							}}
+						>
+							{label}
+						</div>
+						<div
+							style={{
+								marginTop: 14,
+								display: "grid",
+								gridTemplateColumns: "1fr 1fr",
+								gap: 8,
+							}}
+						>
+							{[0, 1, 2, 3].map((i) => (
 								<div
+									key={i}
 									style={{
-										width: 32,
-										height: 32,
-										borderRadius: 8,
-										background: `${palette}55`,
+										aspectRatio: "1",
+										borderRadius: 12,
+										background:
+											i % 2 === 0
+												? `linear-gradient(135deg, ${palette}, ${palette}77)`
+												: `linear-gradient(135deg, ${theme === "dark" ? "rgba(255,255,255,.08)" : "rgba(14,63,21,.06)"}, ${theme === "dark" ? "rgba(255,255,255,.02)" : "rgba(14,63,21,.02)"})`,
+										boxShadow:
+											i % 2 === 0 ? `0 4px 12px -4px ${palette}88` : "none",
 									}}
 								/>
-								<div style={{ flex: 1 }}>
-									<div
-										style={{
-											height: 6,
-											borderRadius: 3,
-											background:
-												theme === "dark"
-													? "rgba(255,255,255,.15)"
-													: "rgba(14,63,21,.1)",
-											width: "80%",
-										}}
-									/>
-									<div
-										style={{
-											height: 4,
-											borderRadius: 2,
-											background:
-												theme === "dark"
-													? "rgba(255,255,255,.08)"
-													: "rgba(14,63,21,.06)",
-											width: "50%",
-											marginTop: 4,
-										}}
-									/>
-								</div>
+							))}
+						</div>
+						<div style={{ marginTop: 14, flex: 1 }}>
+							{[0, 1, 2].map((i) => (
 								<div
-									className="mono"
-									style={{ fontSize: 10, color: palette, fontWeight: 500 }}
+									key={i}
+									className="row center gap-10"
+									style={{
+										padding: "8px 0",
+										borderBottom:
+											theme === "dark"
+												? "1px solid rgba(255,255,255,.06)"
+												: "1px solid rgba(14,63,21,.06)",
+									}}
 								>
-									${(4 + i * 3).toFixed(2)}
+									<div
+										style={{
+											width: 32,
+											height: 32,
+											borderRadius: 8,
+											background: `${palette}55`,
+										}}
+									/>
+									<div style={{ flex: 1 }}>
+										<div
+											style={{
+												height: 6,
+												borderRadius: 3,
+												background:
+													theme === "dark"
+														? "rgba(255,255,255,.15)"
+														: "rgba(14,63,21,.1)",
+												width: "80%",
+											}}
+										/>
+										<div
+											style={{
+												height: 4,
+												borderRadius: 2,
+												background:
+													theme === "dark"
+														? "rgba(255,255,255,.08)"
+														: "rgba(14,63,21,.06)",
+												width: "50%",
+												marginTop: 4,
+											}}
+										/>
+									</div>
+									<div
+										className="mono"
+										style={{ fontSize: 10, color: palette, fontWeight: 500 }}
+									>
+										${(4 + i * 3).toFixed(2)}
+									</div>
 								</div>
-							</div>
-						))}
+							))}
+						</div>
+						<div
+							style={{
+								marginTop: 10,
+								padding: "10px 8px",
+								borderRadius: 16,
+								background:
+									theme === "dark"
+										? "rgba(255,255,255,.05)"
+										: "rgba(14,63,21,.05)",
+								display: "flex",
+								justifyContent: "space-around",
+							}}
+						>
+							{[0, 1, 2, 3].map((i) => (
+								<div
+									key={i}
+									style={{
+										width: 8,
+										height: 8,
+										borderRadius: 999,
+										background:
+											i === 0
+												? palette
+												: theme === "dark"
+													? "rgba(255,255,255,.25)"
+													: "rgba(14,63,21,.2)",
+									}}
+								/>
+							))}
+						</div>
 					</div>
-					<div
-						style={{
-							marginTop: 10,
-							padding: "10px 8px",
-							borderRadius: 16,
-							background:
-								theme === "dark"
-									? "rgba(255,255,255,.05)"
-									: "rgba(14,63,21,.05)",
-							display: "flex",
-							justifyContent: "space-around",
-						}}
-					>
-						{[0, 1, 2, 3].map((i) => (
-							<div
-								key={i}
-								style={{
-									width: 8,
-									height: 8,
-									borderRadius: 999,
-									background:
-										i === 0
-											? palette
-											: theme === "dark"
-												? "rgba(255,255,255,.25)"
-												: "rgba(14,63,21,.2)",
-								}}
-							/>
-						))}
-					</div>
-				</div>
+				)}
 			</div>
 		</div>
 	);
@@ -305,7 +373,7 @@ function PhonesStrip({ app }: { app: App }) {
 		>
 			{app.screens.map((s, k) => (
 				<div
-					key={s.label}
+					key={`${app.name}-${s.label}`}
 					style={{
 						flex: "0 0 auto",
 						scrollSnapAlign: "center",
@@ -321,6 +389,28 @@ function PhonesStrip({ app }: { app: App }) {
 }
 
 export function CaseStudy() {
+	const { messages } = useLanguage();
+	const apps = useMemo(
+		() =>
+			CASE_APP_LAYOUT.map((layout, i) => {
+				const copy = messages.caseStudy.apps[i];
+				const logo = "logo" in layout ? layout.logo : undefined;
+				return {
+					color: layout.color,
+					accent: layout.accent,
+					logo,
+					name: copy.name,
+					client: copy.client,
+					who: copy.who,
+					desc: copy.desc,
+					screens: layout.screens.map((scr, j) => ({
+						...scr,
+						label: copy.screens[j] ?? "",
+					})),
+				} satisfies App;
+			}),
+		[messages],
+	);
 	const [idx, setIdx] = useState(0);
 	const [auto, setAuto] = useState(true);
 	const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -330,13 +420,13 @@ export function CaseStudy() {
 		if (!apps[idx]) return;
 		timer.current = setTimeout(
 			() => setIdx((v) => (v + 1) % apps.length),
-			6000,
+			4500,
 		);
 		return () => {
 			const id = timer.current;
 			if (id !== null) clearTimeout(id);
 		};
-	}, [idx, auto]);
+	}, [idx, auto, apps, apps.length]);
 
 	const go = (d: number) => {
 		setAuto(false);
@@ -380,12 +470,12 @@ export function CaseStudy() {
 				>
 					<div>
 						<div className="eyebrow" style={{ marginBottom: 20 }}>
-							Case study
+							{messages.caseStudy.eyebrow}
 						</div>
 						<h2>
-							Real apps.{" "}
+							{messages.caseStudy.titleBefore}{" "}
 							<span className="serif-italic" style={{ color: "#c084ff" }}>
-								Real customers.
+								{messages.caseStudy.titleHighlight}
 							</span>
 						</h2>
 					</div>
@@ -396,7 +486,9 @@ export function CaseStudy() {
 							className="btn btn-ghost"
 							style={{ padding: "10px 16px", fontSize: 13 }}
 						>
-							{auto ? "⏸ Autoplay" : "▶ Autoplay"}
+							{auto
+								? messages.caseStudy.autoplayOn
+								: messages.caseStudy.autoplayOff}
 						</button>
 						<div className="row gap-8">
 							<button type="button" onClick={() => go(-1)} style={navBtnStyle}>
@@ -435,9 +527,23 @@ export function CaseStudy() {
 									fontWeight: 700,
 									fontSize: 22,
 									boxShadow: `0 10px 30px -10px ${app.color}`,
+									overflow: "hidden",
 								}}
 							>
-								{app.name[0]}
+								{app.logo ? (
+									<img
+										src={app.logo}
+										alt=""
+										draggable={false}
+										style={{
+											width: "78%",
+											height: "78%",
+											objectFit: "contain",
+										}}
+									/>
+								) : (
+									app.name[0]
+								)}
 							</div>
 							<div>
 								<div style={{ fontSize: 24, fontWeight: 500, color: "white" }}>
@@ -512,7 +618,7 @@ export function CaseStudy() {
 									letterSpacing: "0.1em",
 									transition: "all .3s",
 									textAlign: "left",
-									minWidth: 140,
+									minWidth: 0,
 								}}
 							>
 								<div className="mono" style={{ fontSize: 9, opacity: 0.6 }}>
@@ -545,7 +651,7 @@ export function CaseStudy() {
 												width: "100%",
 												height: "100%",
 												background: a.color,
-												animation: "progFill 6s linear",
+												animation: "progFill 4.5s linear",
 												transformOrigin: "left",
 											}}
 										/>

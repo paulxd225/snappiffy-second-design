@@ -1,35 +1,18 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
+import { useLanguage } from "../i18n/LanguageContext";
 
-const items = [
-	{
-		k: "01",
-		t: "Significant savings",
-		d: "70% cheaper development using low-code technologies where it makes sense.",
-		ic: "spark" as const,
-	},
-	{
-		k: "02",
-		t: "Faster development",
-		d: "Get your application implemented in as little as 8 weeks, not months.",
-		ic: "clock" as const,
-	},
-	{
-		k: "03",
-		t: "Easy to scale",
-		d: "Reach thousands of customers simultaneously on infrastructure that grows with you.",
-		ic: "trend" as const,
-	},
-	{
-		k: "04",
-		t: "AI integrated",
-		d: "Keep clients satisfied with AI tools — leave expensive, old-fashioned tech behind.",
-		ic: "brain" as const,
-	},
-];
+type BenefitIcon = "spark" | "clock" | "trend" | "brain";
 
-function BenefitCard({ it, delay }: { it: (typeof items)[0]; delay: number }) {
+type BenefitItem = {
+	k: string;
+	t: string;
+	d: string;
+	ic: BenefitIcon;
+};
+
+function BenefitCard({ it, delay }: { it: BenefitItem; delay: number }) {
 	const ref = useReveal<HTMLButtonElement>();
 	const IconEl = Icons[it.ic];
 	const [hovered, setHovered] = useState(false);
@@ -118,7 +101,20 @@ function BenefitCard({ it, delay }: { it: (typeof items)[0]; delay: number }) {
 	);
 }
 
+const BENEFIT_ICONS: readonly BenefitIcon[] = ["spark", "clock", "trend", "brain"];
+
 export function Benefits() {
+	const { messages } = useLanguage();
+	const items = useMemo<BenefitItem[]>(
+		() =>
+			messages.benefits.items.map((it, i) => ({
+				k: String(i + 1).padStart(2, "0"),
+				t: it.t,
+				d: it.d,
+				ic: BENEFIT_ICONS[i] ?? "spark",
+			})),
+		[messages],
+	);
 	const ref = useReveal();
 	return (
 		<section
@@ -127,11 +123,12 @@ export function Benefits() {
 			style={{
 				background: "linear-gradient(180deg, #0e3f15, #15581c)",
 				paddingTop: 160,
+				overflowX: "hidden",
 			}}
 		>
 			<div className="grid-bg" style={{ opacity: 0.35 }} />
 			<div
-				className="orb"
+				className="orb benefits-orb"
 				style={{
 					width: 420,
 					height: 420,
@@ -154,12 +151,12 @@ export function Benefits() {
 				>
 					<div style={{ maxWidth: 680 }}>
 						<div className="eyebrow" style={{ marginBottom: 20 }}>
-							What you get
+							{messages.benefits.eyebrow}
 						</div>
 						<h2>
-							Integrates all the power of{" "}
+							{messages.benefits.titleBefore}{" "}
 							<span className="serif-italic" style={{ color: "#c084ff" }}>
-								Artificial Intelligence
+								{messages.benefits.titleHighlight}
 							</span>
 						</h2>
 					</div>
@@ -171,8 +168,7 @@ export function Benefits() {
 							lineHeight: 1.6,
 						}}
 					>
-						Four reasons teams pick Snappiffy over an agency or a bloated
-						in-house build.
+						{messages.benefits.blurb}
 					</p>
 				</div>
 				<div
@@ -182,8 +178,8 @@ export function Benefits() {
 						gap: 20,
 					}}
 				>
-					{items.map((it) => (
-						<BenefitCard key={it.k} it={it} delay={items.indexOf(it) * 120} />
+					{items.map((it, i) => (
+						<BenefitCard key={it.k} it={it} delay={i * 120} />
 					))}
 				</div>
 			</div>
