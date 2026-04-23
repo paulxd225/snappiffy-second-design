@@ -372,6 +372,22 @@ export const esESMessages = {
 		phoneSelectCountry: "Elegir país",
 		phoneCountryAria: "Prefijo internacional",
 		phoneNumberAria: "Número de teléfono",
+		validation: {
+			nameRequired: "Indica tu nombre.",
+			nameMax: "El nombre no puede superar 120 caracteres.",
+			emailInvalid: "Introduce un correo electrónico válido.",
+			phoneRequired: "Introduce tu número de teléfono.",
+			phoneDigitsOnly:
+				"El teléfono solo puede contener dígitos (sin letras ni símbolos).",
+			phoneInvalidForCountry:
+				"Este número no coincide con un formato válido para el país seleccionado.",
+			phoneCountryInvalid: "Selección de país no válida.",
+			companyMax: "La empresa no puede superar 150 caracteres.",
+			companyWhitespaceOnly:
+				"La empresa no puede ser solo espacios. Déjala vacía o escribe texto.",
+			messageRequired: "Escribe una descripción.",
+			messageMax: "El mensaje no puede superar 3000 caracteres.",
+		},
 	},
 };
 

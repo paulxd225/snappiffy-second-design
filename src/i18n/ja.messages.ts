@@ -371,5 +371,20 @@ export const jaMessages = {
 		phoneSelectCountry: "国を選択",
 		phoneCountryAria: "国番号",
 		phoneNumberAria: "電話番号",
+		validation: {
+			nameRequired: "お名前を入力してください。",
+			nameMax: "お名前は120文字以内にしてください。",
+			emailInvalid: "有効なメールアドレスを入力してください。",
+			phoneRequired: "電話番号を入力してください。",
+			phoneDigitsOnly: "電話番号は数字のみです（文字や記号は使えません）。",
+			phoneInvalidForCountry:
+				"選択した国で有効な形式の電話番号ではありません。",
+			phoneCountryInvalid: "国の選択が正しくありません。",
+			companyMax: "会社名は150文字以内にしてください。",
+			companyWhitespaceOnly:
+				"会社名を空白のみにはできません。空にするか文字を入力してください。",
+			messageRequired: "説明を入力してください。",
+			messageMax: "メッセージは3000文字以内にしてください。",
+		},
 	},
 };

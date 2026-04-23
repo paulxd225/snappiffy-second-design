@@ -371,5 +371,20 @@ export const koMessages = {
 		phoneSelectCountry: "국가 선택",
 		phoneCountryAria: "국가 전화 코드",
 		phoneNumberAria: "전화번호",
+		validation: {
+			nameRequired: "이름을 입력해 주세요.",
+			nameMax: "이름은 120자 이하여야 합니다.",
+			emailInvalid: "유효한 이메일 주소를 입력해 주세요.",
+			phoneRequired: "전화번호를 입력해 주세요.",
+			phoneDigitsOnly: "전화번호는 숫자만 입력할 수 있습니다(문자·기호 불가).",
+			phoneInvalidForCountry:
+				"선택한 국가에서 유효한 전화번호 형식이 아닙니다.",
+			phoneCountryInvalid: "국가 선택이 올바르지 않습니다.",
+			companyMax: "회사명은 150자 이하여야 합니다.",
+			companyWhitespaceOnly:
+				"회사명을 공백만으로 둘 수 없습니다. 비우거나 내용을 입력하세요.",
+			messageRequired: "설명을 입력해 주세요.",
+			messageMax: "메시지는 3000자 이하여야 합니다.",
+		},
 	},
 };

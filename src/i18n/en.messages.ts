@@ -372,6 +372,21 @@ export const enMessages = {
 		phoneSelectCountry: "Select country",
 		phoneCountryAria: "Country calling code",
 		phoneNumberAria: "Phone number",
+		validation: {
+			nameRequired: "Please enter your name.",
+			nameMax: "Name must be at most 120 characters.",
+			emailInvalid: "Please enter a valid email address.",
+			phoneRequired: "Please enter your phone number.",
+			phoneDigitsOnly: "Phone number must contain digits only (no letters or symbols).",
+			phoneInvalidForCountry:
+				"This number does not match a valid format for the selected country.",
+			phoneCountryInvalid: "Invalid country selection.",
+			companyMax: "Company must be at most 150 characters.",
+			companyWhitespaceOnly:
+				"Company cannot be only spaces. Leave it empty or enter text.",
+			messageRequired: "Please enter a description.",
+			messageMax: "Message must be at most 3000 characters.",
+		},
 	},
 };
 

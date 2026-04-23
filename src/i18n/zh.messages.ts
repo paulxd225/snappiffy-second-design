@@ -371,5 +371,18 @@ export const zhMessages = {
 		phoneSelectCountry: "选择国家",
 		phoneCountryAria: "国际电话区号",
 		phoneNumberAria: "电话号码",
+		validation: {
+			nameRequired: "请填写姓名。",
+			nameMax: "姓名最多 120 个字符。",
+			emailInvalid: "请填写有效的邮箱地址。",
+			phoneRequired: "请填写电话号码。",
+			phoneDigitsOnly: "电话号码只能包含数字（不能有字母或符号）。",
+			phoneInvalidForCountry: "该号码不符合所选国家/地区的有效格式。",
+			phoneCountryInvalid: "国家/地区选择无效。",
+			companyMax: "公司名称最多 150 个字符。",
+			companyWhitespaceOnly: "公司名称不能仅为空格。可留空或输入文字。",
+			messageRequired: "请填写描述。",
+			messageMax: "留言最多 3000 个字符。",
+		},
 	},
 };

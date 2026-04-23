@@ -372,5 +372,21 @@ export const frMessages = {
 		phoneSelectCountry: "Choisir le pays",
 		phoneCountryAria: "Indicatif téléphonique",
 		phoneNumberAria: "Numéro de téléphone",
+		validation: {
+			nameRequired: "Veuillez saisir votre nom.",
+			nameMax: "Le nom ne peut pas dépasser 120 caractères.",
+			emailInvalid: "Veuillez saisir une adresse e-mail valide.",
+			phoneRequired: "Veuillez saisir votre numéro de téléphone.",
+			phoneDigitsOnly:
+				"Le numéro ne doit contenir que des chiffres (pas de lettres ni de symboles).",
+			phoneInvalidForCountry:
+				"Ce numéro ne correspond pas à un format valide pour le pays sélectionné.",
+			phoneCountryInvalid: "Sélection de pays non valide.",
+			companyMax: "L'entreprise ne peut pas dépasser 150 caractères.",
+			companyWhitespaceOnly:
+				"L'entreprise ne peut pas être uniquement des espaces. Laissez vide ou saisissez du texte.",
+			messageRequired: "Veuillez saisir une description.",
+			messageMax: "Le message ne peut pas dépasser 3000 caractères.",
+		},
 	},
 };

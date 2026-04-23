@@ -372,6 +372,22 @@ export const ptMessages = {
 		phoneSelectCountry: "Elegir país",
 		phoneCountryAria: "Prefijo internacional",
 		phoneNumberAria: "Número de teléfono",
+		validation: {
+			nameRequired: "Indique o seu nome.",
+			nameMax: "O nome deve ter no máximo 120 caracteres.",
+			emailInvalid: "Indique um endereço de e-mail válido.",
+			phoneRequired: "Indique o seu número de telefone.",
+			phoneDigitsOnly:
+				"O telefone só pode conter algarismos (sem letras nem símbolos).",
+			phoneInvalidForCountry:
+				"Este número não corresponde a um formato válido para o país selecionado.",
+			phoneCountryInvalid: "Seleção de país inválida.",
+			companyMax: "A empresa deve ter no máximo 150 caracteres.",
+			companyWhitespaceOnly:
+				"A empresa não pode ser só espaços. Deixe vazio ou escreva texto.",
+			messageRequired: "Indique uma descrição.",
+			messageMax: "A mensagem deve ter no máximo 3000 caracteres.",
+		},
 	},
 };
 
