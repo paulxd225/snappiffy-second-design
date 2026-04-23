@@ -1,29 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-
-import cilantro1 from "../assets/apps-examples/cilantro1.png";
-import cilantro2 from "../assets/apps-examples/cilantro2.png";
-import cilantro3 from "../assets/apps-examples/cilantro3.png";
-import cilantro4 from "../assets/apps-examples/cilantro4.png";
-import cilantro5 from "../assets/apps-examples/cilantro5.png";
-import cilantrologo from "../assets/apps-examples/cilantrologo.webp";
-import enterprises1 from "../assets/apps-examples/enterprises1.png";
-import enterprises2 from "../assets/apps-examples/enterprises2.png";
-import enterprises3 from "../assets/apps-examples/enterprises3.png";
-import enterprises4 from "../assets/apps-examples/enterprises4.png";
-import enterprises5 from "../assets/apps-examples/enterprises5.png";
-import enterpriseslogo from "../assets/apps-examples/enterpriseslogo.png";
-import ochurros1 from "../assets/apps-examples/ochurros1.webp";
-import ochurros2 from "../assets/apps-examples/ochurros2.webp";
-import ochurros3 from "../assets/apps-examples/ochurros3.webp";
-import ochurros4 from "../assets/apps-examples/ochurros4.webp";
-import ochurros5 from "../assets/apps-examples/ochurros5.webp";
-import ochurroslogo from "../assets/apps-examples/ochurroslogo.png";
-import shapewear1 from "../assets/apps-examples/shapewear1.png";
-import shapewear2 from "../assets/apps-examples/shapewear2.png";
-import shapewear3 from "../assets/apps-examples/shapewear3.png";
-import shapewear4 from "../assets/apps-examples/shapewear4.png";
-import shapewear5 from "../assets/apps-examples/shapewear5.png";
-import shapewearlogo from "../assets/apps-examples/shapewearlogo.png";
+import { Skeleton } from "../components/ui/skeleton";
 import { useLanguage } from "../i18n/LanguageContext.tsx";
 
 const navBtnStyle: React.CSSProperties = {
@@ -36,65 +12,107 @@ const navBtnStyle: React.CSSProperties = {
 	fontSize: 18,
 	transition: "all .3s",
 };
-
+const LANDING_IMAGES = {
+	greenery: {
+		logo: "https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963523/greenerylogo_ufds64.png",
+		image1:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963525/greenery1_aqi64o.webp",
+		image2:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963524/greenery2_yfjw95.webp",
+		image3:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963524/greenery3_mqh4xk.webp",
+		image4:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963524/greenery4_ka1pqt.webp",
+		image5:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963523/greenery5_conykc.webp",
+	},
+	ochurros: {
+		logo: "https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963521/ochurroslogo_oddtmf.png",
+		image1:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963523/ochurros1_lxbefb.webp",
+		image2:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963522/ochurros2_ztzvje.webp",
+		image3:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963522/ochurros3_cp5afx.webp",
+		image4:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963521/ochurros4_yxoh9v.webp",
+		image5:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963521/ochurros5_utfvlv.webp",
+	},
+	enterprises: {
+		logo: "https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963525/enterpriseslogo_lfhgss.png",
+		image1:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963527/enterprises1_nb8ra4.png",
+		image2:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963527/enterprises2_tc7o42.png",
+		image3:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963527/enterprises3_z7qznk.png",
+		image4:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963526/enterprises4_ufcslz.png",
+		image5:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963526/enterprises5_xv22eb.png",
+	},
+	shapewear: {
+		logo: "https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963520/shapewearlogo_jlehdb.png",
+		image1:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963520/shapewear1_a03je1.png",
+		image2:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963520/shapewear2_bhawf1.png",
+		image3:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963520/shapewear3_rf15tq.png",
+		image4:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963520/shapewear4_p8sskd.png",
+		image5:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963520/shapewear5_jhcldt.png",
+	},
+	cilantro: {
+		logo: "https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963527/cilantrologo_nrjoos.webp",
+		image1:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963530/cilantro1_ispud4.png",
+		image2:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963529/cilantro2_r9kcek.png",
+		image3:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963529/cilantro3_uu84oi.png",
+		image4:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963528/cilantro4_q0bkq3.png",
+		image5:"https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776963528/cilantro5_eeimqn.png",
+	},
+} as const;
 const CASE_APP_LAYOUT = [
 	{
-		color: "#7cd85a",
+		color: "#44C262",
 		accent: "#2ea02c",
+		logo: LANDING_IMAGES.greenery.logo,
 		screens: [
-			{ theme: "dark", palette: "#7cd85a" },
-			{ theme: "dark", palette: "#2ea02c" },
-			{ theme: "light", palette: "#7cd85a" },
-			{ theme: "dark", palette: "#2ea02c" },
-			{ theme: "dark", palette: "#4cc23a" },
+			{ theme: "dark", palette: "#7cd85a", image: LANDING_IMAGES.greenery.image1 },
+			{ theme: "light", palette: "#2ea02c", image: LANDING_IMAGES.greenery.image2 },
+			{ theme: "light", palette: "#4cc23a", image: LANDING_IMAGES.greenery.image3 },
+			{ theme: "dark", palette: "#2d6a4f", image: LANDING_IMAGES.greenery.image4 },
+			{ theme: "light", palette: "#7cd85a", image: LANDING_IMAGES.greenery.image5 },
 		],
 	},
 	{
 		color: "#FFBFFB",
 		accent: "#c084ff",
-		logo: ochurroslogo,
+		logo: LANDING_IMAGES.ochurros.logo,
 		screens: [
-			{ theme: "light", palette: "#ff3df0", image: ochurros1 },
-			{ theme: "light", palette: "#ff7ae3", image: ochurros2 },
-			{ theme: "pink", palette: "#ff3df0", image: ochurros3 },
-			{ theme: "dark", palette: "#c084ff", image: ochurros4 },
-			{ theme: "light", palette: "#ff3df0", image: ochurros5 },
+			{ theme: "light", palette: "#ff3df0", image: LANDING_IMAGES.ochurros.image1 },
+			{ theme: "light", palette: "#ff7ae3", image: LANDING_IMAGES.ochurros.image2 },
+			{ theme: "pink", palette: "#ff3df0", image: LANDING_IMAGES.ochurros.image3 },
+			{ theme: "dark", palette: "#c084ff", image: LANDING_IMAGES.ochurros.image4 },
+			{ theme: "light", palette: "#ff3df0", image: LANDING_IMAGES.ochurros.image5 },
 		],
 	},
 	{
 		color: "#052E85",
 		accent: "#0044cc",
-		logo: enterpriseslogo,
+		logo: LANDING_IMAGES.enterprises.logo,
 		screens: [
-			{ theme: "light", palette: "#1e6bff", image: enterprises1 },
-			{ theme: "dark", palette: "#4d8fff", image: enterprises2 },
-			{ theme: "light", palette: "#0066ff", image: enterprises3 },
-			{ theme: "dark", palette: "#1e6bff", image: enterprises4 },
-			{ theme: "light", palette: "#4d8fff", image: enterprises5 },
+			{ theme: "light", palette: "#1e6bff", image: LANDING_IMAGES.enterprises.image1 },
+			{ theme: "dark", palette: "#4d8fff", image: LANDING_IMAGES.enterprises.image2 },
+			{ theme: "light", palette: "#0066ff", image: LANDING_IMAGES.enterprises.image3 },
+			{ theme: "dark", palette: "#1e6bff", image: LANDING_IMAGES.enterprises.image4 },
+			{ theme: "light", palette: "#4d8fff", image: LANDING_IMAGES.enterprises.image5 },
 		],
 	},
 	{
 		color: "#7A651D",
 		accent: "#8b6914",
-		logo: shapewearlogo,
+		logo: LANDING_IMAGES.shapewear.logo,
 		screens: [
-			{ theme: "light", palette: "#c9a227", image: shapewear1 },
-			{ theme: "dark", palette: "#d4b84a", image: shapewear2 },
-			{ theme: "light", palette: "#e6c84a", image: shapewear3 },
-			{ theme: "dark", palette: "#c9a227", image: shapewear4 },
-			{ theme: "light", palette: "#8b6914", image: shapewear5 },
+			{ theme: "light", palette: "#c9a227", image: LANDING_IMAGES.shapewear.image1 },
+			{ theme: "dark", palette: "#d4b84a", image: LANDING_IMAGES.shapewear.image2 },
+			{ theme: "light", palette: "#e6c84a", image: LANDING_IMAGES.shapewear.image3 },
+			{ theme: "dark", palette: "#c9a227", image: LANDING_IMAGES.shapewear.image4 },
+			{ theme: "light", palette: "#8b6914", image: LANDING_IMAGES.shapewear.image5 },
 		],
 	},
 	{
 		color: "#0f0f0f",
 		accent: "#000",
-		logo: cilantrologo,
+		logo: LANDING_IMAGES.cilantro.logo,
 		screens: [
-			{ theme: "dark", palette: "#2d6a4f", image: cilantro1 },
-			{ theme: "light", palette: "#40916c", image: cilantro2 },
-			{ theme: "dark", palette: "#1b4332", image: cilantro3 },
-			{ theme: "light", palette: "#2d6a4f", image: cilantro4 },
-			{ theme: "dark", palette: "#40916c", image: cilantro5 },
+			{ theme: "dark", palette: "#2d6a4f", image: LANDING_IMAGES.cilantro.image1 },
+			{ theme: "light", palette: "#40916c", image: LANDING_IMAGES.cilantro.image2 },
+			{ theme: "dark", palette: "#1b4332", image: LANDING_IMAGES.cilantro.image3 },
+			{ theme: "light", palette: "#2d6a4f", image: LANDING_IMAGES.cilantro.image4 },
+			{ theme: "dark", palette: "#40916c", image: LANDING_IMAGES.cilantro.image5 },
 		],
 	},
 ] as const;
@@ -113,6 +131,8 @@ type App = {
 
 function PhoneFrame({ screen, app }: { screen: Screen; app: App }) {
 	const { theme, palette, label, image } = screen;
+	const [imgFailed, setImgFailed] = useState(false);
+
 	const bg =
 		theme === "light" ? "#f6faf4" : theme === "pink" ? "#ffe1f3" : "#0e0e12";
 	const fg = theme === "dark" ? "white" : "#0e0e12";
@@ -122,41 +142,56 @@ function PhoneFrame({ screen, app }: { screen: Screen; app: App }) {
 				width: 230,
 				height: 470,
 				borderRadius: 36,
-				background: "#0e0e12",
-				padding: 8,
+				padding: 3,
+				boxSizing: "border-box",
+				display: "flex",
+				flexDirection: "column",
+				background:
+					"linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02))",
+				border: "1px solid rgba(255,255,255,0.08)",
 				boxShadow:
-					"0 30px 60px -20px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06), inset 0 0 0 2px rgba(255,255,255,.04)",
+					"0 30px 60px -20px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.06)",
 				position: "relative",
 			}}
 		>
 			<div
 				style={{
 					width: "100%",
-					height: "100%",
+					flex: 1,
+					minHeight: 0,
 					borderRadius: 28,
+					border: "3px solid #0a0a0a",
+					boxShadow:
+						"inset 0 0 0 0.5px rgba(255,255,255,0.18), 0 6px 24px -8px rgba(0,0,0,0.55)",
 					background: bg,
 					overflow: "hidden",
 					position: "relative",
+					boxSizing: "border-box",
 				}}
 			>
 				<div
+					aria-hidden="true"
 					style={{
 						position: "absolute",
-						top: 8,
+						top: 3,
 						left: "50%",
 						transform: "translateX(-50%)",
-						width: 80,
-						height: 22,
-						background: "#0e0e12",
-						borderRadius: 14,
+						width: "30%",
+						minWidth: 56,
+						maxWidth: 88,
+						height: 9,
+						background: "#0a0a0a",
+						borderRadius: 999,
+						boxShadow: "0 0.5px 1.5px rgba(0,0,0,0.35)",
 						zIndex: 2,
 					}}
 				/>
-				{image ? (
+				{image && !imgFailed ? (
 					<img
 						src={image}
 						alt=""
 						draggable={false}
+						onError={() => setImgFailed(true)}
 						style={{
 							position: "absolute",
 							inset: 0,
@@ -167,10 +202,24 @@ function PhoneFrame({ screen, app }: { screen: Screen; app: App }) {
 							zIndex: 0,
 						}}
 					/>
-				) : (
+				) : null}
+				{image && imgFailed ? (
+					<div
+						aria-hidden="true"
+						style={{
+							position: "absolute",
+							inset: 0,
+							zIndex: 1,
+							overflow: "hidden",
+						}}
+					>
+						<Skeleton className="absolute inset-0 size-full rounded-none" />
+					</div>
+				) : null}
+				{!image ? (
 					<div
 						style={{
-							padding: "36px 14px 14px",
+							padding: "24px 14px 14px",
 							color: fg,
 							height: "100%",
 							display: "flex",
@@ -310,7 +359,7 @@ function PhoneFrame({ screen, app }: { screen: Screen; app: App }) {
 							))}
 						</div>
 					</div>
-				)}
+				) : null}
 			</div>
 		</div>
 	);
@@ -373,7 +422,7 @@ function PhonesStrip({ app }: { app: App }) {
 		>
 			{app.screens.map((s, k) => (
 				<div
-					key={`${app.name}-${s.label}`}
+					key={`${app.name}-${s.label}-${s.image ?? ""}`}
 					style={{
 						flex: "0 0 auto",
 						scrollSnapAlign: "center",

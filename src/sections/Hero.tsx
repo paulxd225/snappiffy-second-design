@@ -1,10 +1,12 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import heroBg from "../assets/hero-bg.jpg";
 import manuelFerrerPhoto from "../assets/manuelferrer.webp";
 import { Icons } from "../components/Icons";
 import { useReveal } from "../hooks/use-reveal";
 import { useLanguage } from "../i18n/LanguageContext";
 
+const HERO_IMAGES = {
+	bg: "https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776970840/hero-bg_iqsqni.jpg",
+}
 const MS_PER_CHAR = 85;
 const PAUSE_AFTER_PHRASE_MS = 1000;
 
@@ -109,7 +111,7 @@ function TechMarquee({
 type CyclePhase = "hold" | "deleting" | "typing";
 
 export function Hero() {
-	const { messages, locale } = useLanguage();
+	const { messages } = useLanguage();
 	const prefix = messages.hero.prefix;
 	const phrases = messages.hero.phrases;
 	const introTarget = useMemo(
@@ -130,6 +132,9 @@ export function Hero() {
 	const [typingTargetIndex, setTypingTargetIndex] = useState(0);
 
 	useEffect(() => {
+		// Re-run when hero copy changes (e.g. language switch via new `messages`).
+		void prefix;
+		void phrases;
 		postIntroReady.current = false;
 		setIntroProgress(0);
 		setLineSplit(false);
@@ -137,7 +142,7 @@ export function Hero() {
 		setCyclePhase(null);
 		setActiveIdx(0);
 		setTypingTargetIndex(0);
-	}, [locale]);
+	}, [prefix, phrases]);
 
 	useEffect(() => {
 		const el = mouseRef.current;
@@ -232,7 +237,7 @@ export function Hero() {
 				style={{
 					position: "absolute",
 					inset: 0,
-					backgroundImage: `url(${heroBg})`,
+					backgroundImage: `url(${HERO_IMAGES.bg})`,
 					backgroundSize: "cover",
 					backgroundPosition: "center",
 					opacity: 0.42,

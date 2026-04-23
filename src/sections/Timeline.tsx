@@ -1,9 +1,14 @@
-import { useMemo, useRef, useSyncExternalStore } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { Skeleton } from "../components/ui/skeleton";
 import { useScrollProgress } from "../hooks/use-scroll-progress";
 import { useLanguage } from "../i18n/LanguageContext";
 
 const MOBILE_MQ = "(max-width: 900px)";
-
+const TIMELINE_IMAGES = {
+	timeline1: "https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776970841/timeline1_lk9b1e.png",
+	timeline2: "https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776970841/timeline2_p7ae8v.png",
+	timeline3: "https://res.cloudinary.com/dufos4tti/image/upload/q_auto/f_auto/v1776970841/timeline3_exppnc.png",
+}
 function subscribeMobile(cb: () => void) {
 	const mq = window.matchMedia(MOBILE_MQ);
 	mq.addEventListener("change", cb);
@@ -18,14 +23,10 @@ function getMobileServerSnapshot() {
 	return false;
 }
 
-import timeline1 from "../assets/timeline1.png";
-import timeline2 from "../assets/timeline2.png";
-import timeline3 from "../assets/timeline3.png";
-
 const STEP_LAYOUT = [
-	{ k: "01", side: "right" as const, image: timeline1 },
-	{ k: "02", side: "left" as const, image: timeline2 },
-	{ k: "03", side: "right" as const, image: timeline3 },
+	{ k: "01", side: "right" as const, image: TIMELINE_IMAGES.timeline1 },
+	{ k: "02", side: "left" as const, image: TIMELINE_IMAGES.timeline2 },
+	{ k: "03", side: "right" as const, image: TIMELINE_IMAGES.timeline3 },
 ] as const;
 
 type TimelineStepData = {
@@ -49,6 +50,8 @@ function TimelineStep({
 	stepWord: string;
 	visualWord: string;
 }) {
+	const [imgFailed, setImgFailed] = useState(false);
+
 	const circle = (
 		<div
 			style={{
@@ -149,42 +152,62 @@ function TimelineStep({
 				boxSizing: "border-box",
 			}}
 		>
-			<img
-				src={s.image}
-				alt=""
-				draggable={false}
-				style={{
-					position: "absolute",
-					inset: 0,
-					width: "100%",
-					height: "100%",
-					objectFit: "cover",
-					objectPosition: "center",
-					zIndex: 0,
-				}}
-			/>
-			<div
-				aria-hidden="true"
-				style={{
-					position: "absolute",
-					inset: 0,
-					zIndex: 1,
-					background:
-						"linear-gradient(135deg, rgba(124,216,90,.15), rgba(155,92,255,.15))",
-					pointerEvents: "none",
-				}}
-			/>
-			<div
-				aria-hidden="true"
-				style={{
-					position: "absolute",
-					inset: 0,
-					zIndex: 2,
-					backgroundImage:
-						"repeating-linear-gradient(45deg, rgba(255,255,255,.03) 0 2px, transparent 2px 14px)",
-					pointerEvents: "none",
-				}}
-			/>
+			{!imgFailed ? (
+				<img
+					src={s.image}
+					alt=""
+					draggable={false}
+					onError={() => setImgFailed(true)}
+					style={{
+						position: "absolute",
+						inset: 0,
+						width: "100%",
+						height: "100%",
+						objectFit: "cover",
+						objectPosition: "center",
+						zIndex: 0,
+					}}
+				/>
+			) : null}
+			{imgFailed ? (
+				<div
+					aria-hidden="true"
+					style={{
+						position: "absolute",
+						inset: 0,
+						zIndex: 0,
+						overflow: "hidden",
+					}}
+				>
+					<Skeleton className="absolute inset-0 size-full rounded-none" />
+				</div>
+			) : null}
+			{!imgFailed ? (
+				<div
+					aria-hidden="true"
+					style={{
+						position: "absolute",
+						inset: 0,
+						zIndex: 1,
+						background:
+							"linear-gradient(135deg, rgba(124,216,90,.15), rgba(155,92,255,.15))",
+						pointerEvents: "none",
+					}}
+				/>
+			) : null}
+			{!imgFailed ? (
+				<div
+					aria-hidden="true"
+					style={{
+						position: "absolute",
+						inset: 0,
+						zIndex: 2,
+						backgroundImage:
+							"repeating-linear-gradient(45deg, rgba(255,255,255,.03) 0 2px, transparent 2px 14px)",
+						pointerEvents: "none",
+					}}
+				/>
+			) : null}
 			<div
 				className="mono"
 				style={{
@@ -380,7 +403,7 @@ export function Timeline() {
 					/>
 					{steps.map((s, i) => (
 						<TimelineStep
-							key={s.k}
+							key={`${s.k}-${s.image}`}
 							s={s}
 							active={p > i / steps.length + 0.05}
 							isMobile={isMobile}

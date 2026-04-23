@@ -4,17 +4,8 @@ import { useReveal } from "../hooks/use-reveal";
 import { useScrollDirection } from "../hooks/use-scroll-direction";
 import { useLanguage } from "../i18n/LanguageContext";
 import manuelFerrerPhoto from "../assets/manuelferrer.webp";
-import claude from "../assets/platform_logos/claude.svg";
-import css3 from "../assets/platform_logos/css-3.svg";
-import firebase from "../assets/platform_logos/firebase.svg";
-import flutter from "../assets/platform_logos/flutter.svg";
-import flutterflow from "../assets/platform_logos/flutterflow.svg";
-import html1 from "../assets/platform_logos/html-1.svg";
-import javascriptR from "../assets/platform_logos/javascript-r.svg";
-import nestjs from "../assets/platform_logos/nestjs.svg";
-import nodejs from "../assets/platform_logos/nodejs.svg";
-import react from "../assets/platform_logos/react.svg";
-import typescript from "../assets/platform_logos/typescript.svg";
+
+const publicIcon = (file: string) => `${import.meta.env.BASE_URL}icons/${file}`;
 
 const MOBILE_MQ = "(max-width: 900px)";
 
@@ -57,30 +48,76 @@ const logos: LogoItem[] = [
 		x: 0.1,
 		y: 0.2,
 		variant: "triple",
-		srcs: [html1, css3, javascriptR],
+		srcs: [
+			publicIcon("html-1.svg"),
+			publicIcon("css-3.svg"),
+			publicIcon("javascript-r.svg"),
+		],
 	},
-	{ id: "react", label: "React", x: 0.22, y: 0.55, variant: "single", src: react },
-	{ id: "flutter", label: "Flutter", x: 0.38, y: 0.15, variant: "single", src: flutter },
+	{
+		id: "react",
+		label: "React",
+		x: 0.22,
+		y: 0.55,
+		variant: "single",
+		src: publicIcon("react.svg"),
+	},
+	{
+		id: "flutter",
+		label: "Flutter",
+		x: 0.38,
+		y: 0.15,
+		variant: "single",
+		src: publicIcon("flutter.svg"),
+	},
 	{
 		id: "flutterflow",
 		label: "FlutterFlow",
 		x: 0.55,
 		y: 0.6,
 		variant: "single",
-		src: flutterflow,
+		src: publicIcon("flutterflow.svg"),
 	},
-	{ id: "firebase", label: "Firebase", x: 0.72, y: 0.22, variant: "single", src: firebase },
-	{ id: "nest", label: "Nest", x: 0.86, y: 0.55, variant: "single", src: nestjs },
-	{ id: "node", label: "Node.js", x: 0.1, y: 0.85, variant: "single", src: nodejs },
+	{
+		id: "firebase",
+		label: "Firebase",
+		x: 0.72,
+		y: 0.22,
+		variant: "single",
+		src: publicIcon("firebase.svg"),
+	},
+	{
+		id: "nest",
+		label: "Nest",
+		x: 0.86,
+		y: 0.55,
+		variant: "single",
+		src: publicIcon("nestjs.svg"),
+	},
+	{
+		id: "node",
+		label: "Node.js",
+		x: 0.1,
+		y: 0.85,
+		variant: "single",
+		src: publicIcon("nodejs.svg"),
+	},
 	{
 		id: "typescript",
 		label: "TypeScript",
 		x: 0.45,
 		y: 0.9,
 		variant: "single",
-		src: typescript,
+		src: publicIcon("typescript.svg"),
 	},
-	{ id: "claude", label: "Claude", x: 0.78, y: 0.88, variant: "single", src: claude },
+	{
+		id: "claude",
+		label: "Claude",
+		x: 0.78,
+		y: 0.88,
+		variant: "single",
+		src: publicIcon("claude.svg"),
+	},
 ];
 
 function ConstellationBand({ v, svgTitle }: { v: number; svgTitle: string }) {
