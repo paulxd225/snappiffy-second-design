@@ -119,7 +119,7 @@ export const koMessages = {
 		autoplayOff: "▶ 자동 재생",
 		apps: [
 			{
-				name: "Greenary",
+				name: "Greenery",
 				client: "랜드마크 시설 조경 · 미국",
 				who: "운영 리드, 공항·호스피탈리티",
 				desc: "공항·호텔·캠퍼스 등 고유동 장소의 관상 식물 프로그램 설치·유지. 크루 경로, 품종 라이브러리, 식물 건강 모니터링을 한 플랫폼에서.",

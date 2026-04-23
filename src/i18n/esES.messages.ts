@@ -120,7 +120,7 @@ export const esESMessages = {
 		autoplayOff: "▶ Autoplay",
 		apps: [
 			{
-				name: "Greenary",
+				name: "Greenery",
 				client: "Jardinería para espacios emblemáticos · EE. UU.",
 				who: "Responsable de operaciones, aeropuertos y hostelería",
 				desc: "Instala y mantiene programas de planta ornamental en lugares de alto tráfico — aeropuertos, hoteles y campus — con rutas de equipo, biblioteca de especies y monitorización de salud en una sola plataforma.",

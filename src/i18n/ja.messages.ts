@@ -119,7 +119,7 @@ export const jaMessages = {
 		autoplayOff: "▶ 自動再生",
 		apps: [
 			{
-				name: "Greenary",
+				name: "Greenery",
 				client: "ランドマーク施設向け園芸 · 米国",
 				who: "オペレーション責任者、空港・ホスピタリティ",
 				desc: "空港・ホテル・キャンパスなど高人流エリアの観賞植物プログラムの設置・維持。クルールート、品種ライブラリ、植物の健康監視を1つのプラットフォームで。",

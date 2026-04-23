@@ -119,7 +119,7 @@ export const zhMessages = {
 		autoplayOff: "▶ 自动播放",
 		apps: [
 			{
-				name: "Greenary",
+				name: "Greenery",
 				client: "地标场所园艺 · 美国",
 				who: "运营负责人，机场与酒店",
 				desc: "在机场、酒店与校园等高流量场所安装维护观赏植物项目，并提供路线、物种库与植物健康监测的一体化平台。",

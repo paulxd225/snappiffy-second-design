@@ -120,7 +120,7 @@ export const ptMessages = {
 		autoplayOff: "▶ Autoplay",
 		apps: [
 			{
-				name: "Greenary",
+				name: "Greenery",
 				client: "Horticultura para espaços emblemáticos · EUA",
 				who: "Líder de operações, aeroportos e hotelaria",
 				desc: "Instala e mantém programas de plantas ornamentais em locais de grande fluxo — aeroportos, hotéis e campi — com rotas de equipe, biblioteca de espécies e monitoramento de saúde numa só plataforma.",

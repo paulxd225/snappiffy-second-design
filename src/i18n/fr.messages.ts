@@ -120,7 +120,7 @@ export const frMessages = {
 		autoplayOff: "▶ Lecture auto",
 		apps: [
 			{
-				name: "Greenary",
+				name: "Greenery",
 				client: "Horticulture pour sites emblématiques · US",
 				who: "Responsable ops, aéroports & hôtellerie",
 				desc: "Installation et entretien végétal dans lieux à fort trafic — routage équipes, bibliothèque d'espèces et suivi santé des plantes sur une plateforme.",

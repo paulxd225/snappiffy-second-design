@@ -120,7 +120,7 @@ export const enMessages = {
 		autoplayOff: "▶ Autoplay",
 		apps: [
 			{
-				name: "Greenary",
+				name: "Greenery",
 				client: "Horticulture for landmark venues · US",
 				who: "Operations lead, airports & hospitality",
 				desc: "Install and maintain ornamental plant programs across high-traffic places—airports, hotels, and campuses—with crew routing, species libraries, and plant-health monitoring in one platform.",
