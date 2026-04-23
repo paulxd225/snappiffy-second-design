@@ -2,7 +2,7 @@ import { About } from "./sections/About";
 import { Benefits } from "./sections/Benefits";
 import { CaseStudy } from "./sections/CaseStudy";
 import { FAQ } from "./sections/FAQ";
-import { Footer } from "./sections/Footer";
+import { Footer } from "./sections/Footer/Footer";
 import { Header } from "./sections/Header";
 import { Hero } from "./sections/Hero";
 import { Industries } from "./sections/Industries";
